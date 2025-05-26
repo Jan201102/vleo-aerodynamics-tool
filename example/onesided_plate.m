@@ -1,6 +1,14 @@
 import vleo_aerodynamics_core.*
 clear;
 
+%load model data
+[test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
+display(test_folder)
+lut = fullfile(test_folder, 'cl_cd_cVAE_A01_flat_and_bird.csv');
+if ~isfile(lut)
+    error("Look-up table file not found. Please check the path: %s", lut);
+end
+
 
 %create a unit plate of two triangles laying in the xy plane
 %with the normal pointing in the negative z direction
@@ -13,16 +21,6 @@ plate{1}.vertices_B(:,:,1) = [-0.5 0.5 -0.5;
 plate{1}.vertices_B(:,:,2) = [0.5 0.5 -0.5;
                             0.5 -0.5 0.5;
                             0 0 0];
-
-%{
- plate{1}.vertices_B(:,:,3) = [-0.5 0.5 -0.5;
-                            -0.5 -0.5 0.5;
-                            0 0 0];
-plate{1}.vertices_B(:,:,4) = [0.5 0.5 -0.5;
-                            0.5 -0.5 0.5;
-                            0 0 0]; 
-%}
-
 
 plate{1}.centroids_B = squeeze(mean(plate{1}.vertices_B, 2));
 plate{1}.normals_B = [0 0 ; 0 0 ; -1 -1 ];
@@ -71,7 +69,8 @@ for model = 1:2
                 plate,...
                 current_angle,...
                 temperature_ratio_method,...
-                model);
+                model,...
+                lut);
     end
 end
 %plot forces
@@ -85,7 +84,8 @@ title(ax1, 'Aerodynamic Forces');
 xlabel("x");
 ylabel("y");
 zlabel("z [N]");
-plot3(ax1,aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1),'DisplayName', 'Model 1');
-plot3(ax1,aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2),'DisplayName', 'Model 2');
+plot3(ax1,aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1),'DisplayName', 'Sentman');
+plot3(ax1,aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2),'DisplayName', 'IRS');
 legend(ax1);
+view(ax1,[0 -1 0]);
 
