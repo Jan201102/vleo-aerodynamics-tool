@@ -2,6 +2,7 @@
 % calculate the lift to drag ratio for sentman and the new IRS model
 % for a two sided flat plate and plot the results
 import vleo_aerodynamics_core.*
+addpath("analysis/functions");
 clear;
 
 % Import constants from environment:definitions.m

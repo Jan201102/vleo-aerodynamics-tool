@@ -1,6 +1,7 @@
 %% AERODYNAMIC STIFFNESS
 % calculate the aerodynamic stiffness for a satellite for different control surface configurations
 import vleo_aerodynamics_core.*
+addpath("analysis/functions");
 clear;
 
 %load environment data
