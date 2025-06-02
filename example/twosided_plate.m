@@ -5,7 +5,7 @@ clear;
 %load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
-lut = fullfile(test_folder, 'cl_cd_cVAE_A01_flat_and_bird.csv');
+lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
 if ~isfile(lut)
     error("Look-up table file not found. Please check the path: %s", lut);
 end
