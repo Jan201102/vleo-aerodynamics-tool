@@ -5,17 +5,32 @@ clear;
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
+%% Geometry selection parameter
+% Set to 'plate' for flat plate geometry or 'satellite' for satellite model
+geometry_type = 'plate'; % Options: 'plate' or 'satellite'
+
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
-lut = fullfile(test_folder, 'cl_cd_cVAE_A01_flat_and_bird.csv');
+lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
 if ~isfile(lut)
     error("Look-up table file not found. Please check the path: %s", lut);
 end
 
-sattelite = load_model();
-
-showBodies(sattelite, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+%% load geometry based on parameter
+if strcmp(geometry_type, 'plate')
+    satellite = parametrized_flat_plate(1.0, 1.0, 0.5, 0.0);
+    showBodies(satellite, [0], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+elseif strcmp(geometry_type, 'satellite')
+    satellite = load_model();
+    showBodies(satellite, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+    num_bodies = 5;
+    rotation_face_index = 4;
+else
+    error("Invalid geometry_type. Use 'plate' or 'satellite'.");
+end
 
 %%
 num_angles = 101;
@@ -26,8 +41,8 @@ attitude_quaternion_BI = [1; 0; 0; 0];
 for model = 1:2
     for i = 1:num_angles
         current_angle = control_surface_angles__rad(i);
-        bodies_rotation_angles__rad = zeros(1,5);
-        bodies_rotation_angles__rad(4) = current_angle;
+        bodies_rotation_angles__rad = zeros(1, num_bodies);
+        bodies_rotation_angles__rad(rotation_face_index) = current_angle;
         [aerodynamic_force_B__N(:,i,model), ...
             aerodynamic_torque_B_B__Nm(:,i,model)] = ...
             vleoAerodynamics(attitude_quaternion_BI, ...
@@ -37,7 +52,7 @@ for model = 1:2
                              density__kg_per_m3, ...
                              temperature__K, ... 
                              particles_mass__kg, ...
-                             sattelite, ...                                                       
+                             satellite, ...                                                       
                              bodies_rotation_angles__rad, ...
                              temperature_ratio_method,...
                              model,...
@@ -54,3 +69,32 @@ plot(aerodynamic_torque_B_B__Nm(2,:,2), -aerodynamic_force_B__N(1,:,2), 'r', 'Di
 xlabel('pitch Torque [Nm]');
 ylabel('Drag [N]');
 legend();
+%% plot force envelope
+
+figure;
+tl = tiledlayout('flow');
+title(tl, 'Aerodynamic Forces and Torques');
+ax1 = nexttile;
+grid on;
+hold on;
+title(ax1, 'Aerodynamic Forces');
+xlabel("x");
+ylabel("y");
+zlabel("z [N]");
+plot3(ax1,aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1),'DisplayName', 'Sentman');
+plot3(ax1,aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2),'DisplayName', 'IRS');
+legend(ax1);
+view(ax1,[0 -1 0]);
+
+ax2 = nexttile;
+grid on;
+hold on;
+title(ax2, 'Aerodynamic Torques');
+xlabel("x");
+ylabel("y");
+zlabel("z [Nm]");
+plot3(ax2,aerodynamic_torque_B_B__Nm(1,:,1), aerodynamic_torque_B_B__Nm(2,:,1), aerodynamic_torque_B_B__Nm(3,:,1),'DisplayName', 'Sentman');
+plot3(ax2,aerodynamic_torque_B_B__Nm(1,:,2), aerodynamic_torque_B_B__Nm(2,:,2), aerodynamic_torque_B_B__Nm(3,:,2),'DisplayName', 'IRS');
+legend(ax2);
+view(ax2,[0 -1 0]);
+

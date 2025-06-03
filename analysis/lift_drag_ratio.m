@@ -11,40 +11,14 @@ run('environment_definitions.m');
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
-lut = fullfile(test_folder, 'cl_cd_cVAE_A01_flat_and_bird.csv');
+lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
 if ~isfile(lut)
     error("Look-up table file not found. Please check the path: %s", lut);
 end
-
-%% define two sided flat plate
-plate = cell(1,1);
-plate{1}.vertices_B = zeros(3,3,4);
-plate{1}.vertices_B(:,:,1) = [-0.5 0.5 -0.5;
-                            -0.5 -0.5 0.5;
-                            -1e-10 -1e-10 -1e-10];
-plate{1}.vertices_B(:,:,2) = [0.5 0.5 -0.5;
-                            0.5 -0.5 0.5;
-                            -1e-10 -1e-10 -1e-10];
-
-
-plate{1}.vertices_B(:,:,3) = [-0.5 0.5 -0.5;
-                            -0.5 -0.5 0.5;
-                            1e-10 1e-10 1e-10];
-plate{1}.vertices_B(:,:,4) = [0.5 0.5 -0.5;
-                            0.5 -0.5 0.5;
-                            1e-10 1e-10 1e-10]; 
-
-
-
-plate{1}.centroids_B = squeeze(mean(plate{1}.vertices_B, 2));
-plate{1}.normals_B = [0 0 0 0; 0 0 0 0; -1 -1 1 1];
-plate{1}.areas = [0.5 0.5 0.5 0.5];
-%rotation hinge point is the centroid of the plate
-plate{1}.rotation_hinge_point_B = [0;0;0];
-plate{1}.rotation_direction_B = [0;-1;0];
-plate{1}.temperatures__K = [300;300;300;300];
-plate{1}.energy_accommodation_coefficients = [0.9;0.9;0.9;0.9];
-
+%% flat plate
+% Create a flat plate using the parametrized function
+% Parameters: x_dim=1, y_dim=1, cog_x=0, cog_y=0 (unit square centered at origin)
+plate = parametrized_flat_plate(1.0, 1.0, 0.0, 0.0);
 %% calculate aerodynamic forces
 
 %loops
