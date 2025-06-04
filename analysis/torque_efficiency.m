@@ -6,8 +6,8 @@ clear;
 run('environment_definitions.m');
 
 %% Geometry selection parameter
-% Set to 'plate' for flat plate geometry or 'satellite' for satellite model
-geometry_type = 'plate'; % Options: 'plate' or 'satellite'
+% Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
+geometry_type = 'plate'; % Options: 'plate' or 'shuttlecock'
 
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
@@ -19,17 +19,17 @@ end
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    satellite = parametrized_flat_plate(1.0, 1.0, 0.5, 0.0);
-    showBodies(satellite, [0], 0.75, 0.25);
+    bodies = parametrized_flat_plate(1.0, 1.0, 0.5, 0.0);
+    showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
-elseif strcmp(geometry_type, 'satellite')
-    satellite = load_model();
-    showBodies(satellite, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+elseif strcmp(geometry_type, 'shuttlecock')
+    bodies = load_model();
+    showBodies(bodies, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = 4;
 else
-    error("Invalid geometry_type. Use 'plate' or 'satellite'.");
+    error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
 
 %%
@@ -52,7 +52,7 @@ for model = 1:2
                              density__kg_per_m3, ...
                              temperature__K, ... 
                              particles_mass__kg, ...
-                             satellite, ...                                                       
+                             bodies, ...                                                       
                              bodies_rotation_angles__rad, ...
                              temperature_ratio_method,...
                              model,...
@@ -61,19 +61,23 @@ for model = 1:2
 end
 
 figure;
-title('Aerodynamic Torque efficiency');
+title(sprintf('Aerodynamic Torque efficiency for %s geometry', geometry_type));
 hold on;
 grid on;
 plot(aerodynamic_torque_B_B__Nm(2,:,1), -aerodynamic_force_B__N(1,:,1), 'b', 'DisplayName', 'Sentman');
 plot(aerodynamic_torque_B_B__Nm(2,:,2), -aerodynamic_force_B__N(1,:,2), 'r', 'DisplayName', 'IRS model');
 xlabel('pitch Torque [Nm]');
 ylabel('Drag [N]');
-legend();
+legend('Location', 'northwest');
+
+%% Save figure as PNG and EPS
+saveas(gcf, sprintf('torque_efficiency_%s.png', geometry_type));
+saveas(gcf, sprintf('torque_efficiency_%s.eps',geometry_type), 'epsc');
 %% plot force envelope
 
 figure;
 tl = tiledlayout('flow');
-title(tl, 'Aerodynamic Forces and Torques');
+title(tl, sprintf('Aerodynamic Forces and Torques for %s gemoetry', geometry_type));
 ax1 = nexttile;
 grid on;
 hold on;
@@ -81,8 +85,8 @@ title(ax1, 'Aerodynamic Forces');
 xlabel("x");
 ylabel("y");
 zlabel("z [N]");
-plot3(ax1,aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1),'DisplayName', 'Sentman');
-plot3(ax1,aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2),'DisplayName', 'IRS');
+plot3(ax1,aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1),"b",'DisplayName', 'Sentman');
+plot3(ax1,aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2),"r",'DisplayName', 'IRS');
 legend(ax1);
 view(ax1,[0 -1 0]);
 
@@ -93,8 +97,8 @@ title(ax2, 'Aerodynamic Torques');
 xlabel("x");
 ylabel("y");
 zlabel("z [Nm]");
-plot3(ax2,aerodynamic_torque_B_B__Nm(1,:,1), aerodynamic_torque_B_B__Nm(2,:,1), aerodynamic_torque_B_B__Nm(3,:,1),'DisplayName', 'Sentman');
-plot3(ax2,aerodynamic_torque_B_B__Nm(1,:,2), aerodynamic_torque_B_B__Nm(2,:,2), aerodynamic_torque_B_B__Nm(3,:,2),'DisplayName', 'IRS');
+plot3(ax2,aerodynamic_torque_B_B__Nm(1,:,1), aerodynamic_torque_B_B__Nm(2,:,1), aerodynamic_torque_B_B__Nm(3,:,1),"b",'DisplayName', 'Sentman');
+plot3(ax2,aerodynamic_torque_B_B__Nm(1,:,2), aerodynamic_torque_B_B__Nm(2,:,2), aerodynamic_torque_B_B__Nm(3,:,2),"r",'DisplayName', 'IRS');
 legend(ax2);
 view(ax2,[0 -1 0]);
 

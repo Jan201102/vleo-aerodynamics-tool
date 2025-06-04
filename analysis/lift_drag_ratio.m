@@ -8,6 +8,10 @@ clear;
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
+%% Geometry selection parameter
+% Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
+geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
+
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
@@ -15,10 +19,22 @@ lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
 if ~isfile(lut)
     error("Look-up table file not found. Please check the path: %s", lut);
 end
-%% flat plate
-% Create a flat plate using the parametrized function
-% Parameters: x_dim=1, y_dim=1, cog_x=0, cog_y=0 (unit square centered at origin)
-plate = parametrized_flat_plate(1.0, 1.0, 0.0, 0.0);
+
+%% load geometry based on parameter
+if strcmp(geometry_type, 'plate')
+    bodies = parametrized_flat_plate(1.0, 1.0, 0.0, 0.0);
+    showBodies(bodies, [0], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+elseif strcmp(geometry_type, 'shuttlecock')
+    bodies = load_model();
+    showBodies(bodies, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+    num_bodies = 5;
+    rotation_face_index = 4;
+else
+    error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
+end
+
 %% calculate aerodynamic forces
 
 %loops
@@ -29,6 +45,8 @@ aerodynamic_force_B__N = nan(3, num_angles,2);
 for model = 1:2
     for i = 1:num_angles
         current_angle = control_surface_angles__rad(i);
+        bodies_rotation_angles__rad = zeros(1, num_bodies);
+        bodies_rotation_angles__rad(rotation_face_index) = current_angle;
         [aerodynamic_force_B__N(:,i,model), ~] = ...
             vleoAerodynamics(...
                 attitude_quarternion_BI,...
@@ -38,8 +56,8 @@ for model = 1:2
                 density__kg_per_m3,...
                 temperature__K,...
                 particles_mass__kg,...
-                plate,...
-                current_angle,...
+                bodies,...
+                bodies_rotation_angles__rad,...
                 temperature_ratio_method,...
                 model,...
                 lut);
@@ -60,9 +78,13 @@ lift_to_drag_ratio_new = lift_new__N./drag_new__N;
 figure;
 hold on;
 grid on;
-plot(control_surface_angles__rad, lift_to_drag_ratio_sentman, 'DisplayName', 'Sentman Model');
-plot(control_surface_angles__rad, lift_to_drag_ratio_new, 'DisplayName', 'New IRS Model');
+plot(control_surface_angles__rad, lift_to_drag_ratio_sentman,"b", 'DisplayName', 'Sentman Model');
+plot(control_surface_angles__rad, lift_to_drag_ratio_new,"r", 'DisplayName', 'New IRS Model');
 xlabel('angle of attack [rad]');
 ylabel('lift to drag ratio');
-title('Lift to Drag Ratio Comparison');
+title(sprintf('Lift to Drag Ratio Comparison for %s geometry',geometry_type));
 legend;
+
+%% Save figure as PNG and EPS
+saveas(gcf, sprintf('lift_drag_ratio_%s.png', geometry_type));
+saveas(gcf, sprintf('lift_drag_ratio_%s.eps', geometry_type), 'epsc');

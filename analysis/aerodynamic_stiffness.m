@@ -7,7 +7,7 @@ clear;
 %load environment data
 run("environment_definitions.m");
 %% Geometry selection parameter
-geometry_type = 'satellite'; % Options: 'plate' or 'satellite'
+geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
@@ -15,13 +15,13 @@ if strcmp(geometry_type, 'plate')
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
-elseif strcmp(geometry_type, 'satellite')
+elseif strcmp(geometry_type, 'shuttlecock')
     bodies = load_model();
     showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = [2,3,4,5];
 else
-    error("Invalid geometry_type. Use 'plate' or 'satellite'.");
+    error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
 
 %% load model data
@@ -61,12 +61,16 @@ end
 
 %% plot stiffness of control surface angle for both models in two subplots with a tiled layout
 figure;
-plot(control_surface_angles__rad, aero_stiffness(:,1), 'b', 'LineWidth', 1);
+plot(control_surface_angles__rad, aero_stiffness(:,1), 'b');
 hold on;
-plot(control_surface_angles__rad, aero_stiffness(:,2), 'r', 'LineWidth', 1);
+plot(control_surface_angles__rad, aero_stiffness(:,2), 'r');
 grid on;
 xlabel('Control Surface Angle [rad]');
 ylabel('Aerodynamic Stiffness [Nm/rad]');
 legend('Sentman', 'IRS model');
-title('Aerodynamic Stiffness vs Control Surface Angle');
+title(sprintf('Aerodynamic Stiffness vs Control Surface Angle for %s geometry', geometry_type));
 hold off;
+
+%% Save figure as PNG and EPS
+saveas(gcf, sprintf('aerodynamic_stiffness_%s.png', geometry_type));
+saveas(gcf, sprintf('aerodynamic_stiffness_%s.eps', geometry_type), 'epsc');
