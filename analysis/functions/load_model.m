@@ -16,7 +16,7 @@ function bodies = load_model()
                                  }));
 
     surface_temperatures__K = num2cell(300*(0:4));
-    surface_energy_accommodation_coefficients = num2cell(0.01*ones(1,5));
+    surface_energy_accommodation_coefficients = num2cell(0.9*ones(1,5));
 
     rotation_hinge_points_CAD = [0,0,0,0.05,-0.05;...
                                 0,-0.05,0.05,0,0;...
