@@ -7,7 +7,7 @@ run('environment_definitions.m');
 
 %% Geometry selection parameter
 % Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
-geometry_type = 'plate'; % Options: 'plate' or 'shuttlecock'
+geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
 
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
@@ -19,7 +19,7 @@ end
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(1.0, 1.0, 0.5, 0.0);
+    bodies = parametrized_flat_plate(0.13333333, 0.098, 0.07, 0.0,false);
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
@@ -28,6 +28,11 @@ elseif strcmp(geometry_type, 'shuttlecock')
     showBodies(bodies, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = 4;
+elseif strcmp(geometry_type, 'shuttlecock_wing')
+    bodies = load_shuttlecock_wing();
+    showBodies(bodies, [0/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
 else
     error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
@@ -38,8 +43,8 @@ control_surface_angles__rad = linspace(0, pi/2, num_angles);
 aerodynamic_force_B__N = nan(3, num_angles, 2);
 aerodynamic_torque_B_B__Nm = aerodynamic_force_B__N;
 attitude_quaternion_BI = [1; 0; 0; 0];
-for model = 1:2
-    for i = 1:num_angles
+for i = 1:num_angles
+    for model = 1:2
         current_angle = control_surface_angles__rad(i);
         bodies_rotation_angles__rad = zeros(1, num_bodies);
         bodies_rotation_angles__rad(rotation_face_index) = current_angle;
@@ -56,10 +61,29 @@ for model = 1:2
                              bodies_rotation_angles__rad, ...
                              temperature_ratio_method,...
                              model,...
+                             1, ...
                              lut);
     end
 end
+%% plot force envelopes for each bodie in a subplot with tiled layout
+figure;
+tl = tiledlayout('flow');
+title(tl, sprintf('Aerodynamic Forces for %s geometry', geometry_type));
+for b = 1:num_bodies
+    ax = nexttile;
+    grid on;
+    hold on;
+    title(ax, sprintf('Body %d', b));
+    xlabel("x");
+    ylabel("y");
+    zlabel("z [N]");
+    plot3(ax, squeeze(aerodynamic_force_B__N(1,b,:,1)), squeeze(aerodynamic_force_B__N(2,b,:,1)), squeeze(aerodynamic_force_B__N(3,b,:,1)), "b-o", 'DisplayName', 'Sentman');
+    plot3(ax, squeeze(aerodynamic_force_B__N(1,b,:,2)), squeeze(aerodynamic_force_B__N(2,b,:,2)), squeeze(aerodynamic_force_B__N(3,b,:,2)), "r-o", 'DisplayName', 'IRS');
+    legend(ax,"location","northwest");
+    view(ax, [0 -1 0]);
+end
 
+%% plot torque efficiency
 figure;
 title(sprintf('Aerodynamic Torque efficiency for %s geometry', geometry_type));
 hold on;

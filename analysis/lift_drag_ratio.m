@@ -60,6 +60,7 @@ for model = 1:2
                 bodies_rotation_angles__rad,...
                 temperature_ratio_method,...
                 model,...
+                1,...
                 lut);
     end
 end
@@ -80,7 +81,7 @@ hold on;
 grid on;
 plot(control_surface_angles__rad, lift_to_drag_ratio_sentman,"b", 'DisplayName', 'Sentman Model');
 plot(control_surface_angles__rad, lift_to_drag_ratio_new,"r", 'DisplayName', 'New IRS Model');
-xlabel('angle of attack [rad]');
+xlabel('control surface angle [rad]');
 ylabel('lift to drag ratio');
 title(sprintf('Lift to Drag Ratio Comparison for %s geometry',geometry_type));
 legend;

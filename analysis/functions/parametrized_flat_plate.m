@@ -1,4 +1,4 @@
-function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y)
+function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided)
     % CREATE_FLAT_PLATE Creates a flat plate body structure
     %
     % Inputs:
@@ -6,9 +6,15 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y)
     %   y_dim - dimension in y direction (height)
     %   cog_x - x coordinate of center of gravity in CAD system
     %   cog_y - y coordinate of center of gravity in CAD system
+    %   two_sided - logical, true for two-sided plate, false for one-sided (optional, default: true)
     %
     % Output:
     %   bodies - 1x1 cell containing body structure in body frame (centered at COG)
+    
+    % Default to two-sided if not specified
+    if nargin < 5
+        two_sided = true;
+    end
     
     % Half dimensions for easier vertex calculation
     half_x = x_dim / 2;
@@ -17,9 +23,12 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y)
     % Create body structure
     body = struct();
     
+    % Determine number of triangles based on plate type
+    num_triangles = two_sided * 4 + ~two_sided * 2;
+    
     % Create vertices in CAD system (plate symmetric about origin)
     % Then transform to body frame by subtracting COG coordinates
-    body.vertices_B = zeros(3,3,4);
+    body.vertices_B = zeros(3,3,num_triangles);
     
     % Bottom face triangles (normal pointing in -z direction)
     % CAD vertices transformed to body frame
@@ -31,24 +40,30 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y)
                               -half_y - cog_y,  half_y - cog_y,  half_y - cog_y;
                               -1e-10, -1e-10, -1e-10];
     
-    % Top face triangles (normal pointing in +z direction)
-    body.vertices_B(:,:,3) = [-half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
-                              -half_y - cog_y, -half_y - cog_y,  half_y - cog_y;
-                               1e-10,  1e-10,  1e-10];
-    
-    body.vertices_B(:,:,4) = [ half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
-                              -half_y - cog_y,  half_y - cog_y,  half_y - cog_y;
-                               1e-10,  1e-10,  1e-10];
+    if two_sided
+        % Top face triangles (normal pointing in +z direction)
+        body.vertices_B(:,:,3) = [-half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
+                                  -half_y - cog_y, -half_y - cog_y,  half_y - cog_y;
+                                   1e-10,  1e-10,  1e-10];
+        
+        body.vertices_B(:,:,4) = [ half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
+                                  -half_y - cog_y,  half_y - cog_y,  half_y - cog_y;
+                                   1e-10,  1e-10,  1e-10];
+    end
     
     % Calculate centroids
     body.centroids_B = squeeze(mean(body.vertices_B, 2));
     
     % Define normals (pointing outward)
-    body.normals_B = [0 0 0 0; 0 0 0 0; -1 -1 1 1];
+    if two_sided
+        body.normals_B = [0 0 0 0; 0 0 0 0; -1 -1 1 1];
+    else
+        body.normals_B = [0 0; 0 0; -1 -1];
+    end
     
     % Calculate areas (each triangle is half the total plate area)
     triangle_area = (x_dim * y_dim) / 2;
-    body.areas = [triangle_area, triangle_area, triangle_area, triangle_area];
+    body.areas = repmat(triangle_area, 1, num_triangles);
     
     % Rotation hinge point at body frame origin (COG in CAD system)
     body.rotation_hinge_point_B = [0; 0; 0];
@@ -57,8 +72,8 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y)
     body.rotation_direction_B = [0; -1; 0];
     
     % Default material properties
-    body.temperatures__K = [300; 300; 300; 300];
-    body.energy_accommodation_coefficients = [0.9; 0.9; 0.9; 0.9];
+    body.temperatures__K = repmat(300, num_triangles, 1);
+    body.energy_accommodation_coefficients = repmat(0.9, num_triangles, 1);
     
     % Return as 1x1 cell
     bodies = cell(1,1);
