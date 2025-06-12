@@ -1,4 +1,4 @@
-function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided)
+function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided,energy_accommodation_coefficient,surface_temp__K)
     % CREATE_FLAT_PLATE Creates a flat plate body structure
     %
     % Inputs:
@@ -10,7 +10,15 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided)
     %
     % Output:
     %   bodies - 1x1 cell containing body structure in body frame (centered at COG)
-    
+    arguments
+        x_dim (1,1) double {mustBePositive} = 1.0; % Width of the plate
+        y_dim (1,1) double {mustBePositive} = 1.0; % Height of the plate
+        cog_x (1,1) double = 0.0; % Center of gravity x coordinate in CAD system
+        cog_y (1,1) double = 0.0; % Center of gravity y coordinate in CAD system
+        two_sided (1,1) logical = true; % Two-sided plate flag
+        energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
+        surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
+    end
     % Default to two-sided if not specified
     if nargin < 5
         two_sided = true;
@@ -72,8 +80,8 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided)
     body.rotation_direction_B = [0; -1; 0];
     
     % Default material properties
-    body.temperatures__K = repmat(300, num_triangles, 1);
-    body.energy_accommodation_coefficients = repmat(0.9, num_triangles, 1);
+    body.temperatures__K = repmat(surface_temp__K, num_triangles, 1);
+    body.energy_accommodation_coefficients = repmat(energy_accommodation_coefficient, num_triangles, 1);
     
     % Return as 1x1 cell
     bodies = cell(1,1);

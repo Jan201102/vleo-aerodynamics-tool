@@ -1,7 +1,12 @@
 %% LOAD MODEL
 %% This functions loads the shuttle cock configuration sattelite
 %  from .obj files stored in the example folder
-function bodies = load_model()
+function bodies = load_model(energy_accommodation_coefficient,surface_temp__K)
+    arguments
+        energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
+        surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
+    end
+
     import vleo_aerodynamics_core.*
     % Get absolute path of test folder
     %[test_folder,~,~] = fileparts(mfilename("fullpath"));
@@ -15,8 +20,8 @@ function bodies = load_model()
                                  'WingLeft.obj'
                                  }));
 
-    surface_temperatures__K = num2cell(300*(0:4));
-    surface_energy_accommodation_coefficients = num2cell(0.9*ones(1,5));
+    surface_temperatures__K = num2cell(surface_temp__K*ones(1,5));
+    surface_energy_accommodation_coefficients = num2cell(energy_accommodation_coefficient*ones(1,5));
 
     rotation_hinge_points_CAD = [0,0,0,0.05,-0.05;...
                                 0,-0.05,0.05,0,0;...

@@ -11,26 +11,31 @@ run('environment_definitions.m');
 %% Geometry selection parameter
 % Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
-
+energy_accomodation = 1;
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
-lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
+lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method_sentman.csv');
 if ~isfile(lut)
     error("Look-up table file not found. Please check the path: %s", lut);
 end
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(1.0, 1.0, 0.0, 0.0);
+    bodies = parametrized_flat_plate(0.13333, 0.098, 0.0, 0.0,true,energy_accomodation);
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
 elseif strcmp(geometry_type, 'shuttlecock')
-    bodies = load_model();
-    showBodies(bodies, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+    bodies = load_from_gmsh(energy_accomodation);
+    showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = 4;
+elseif strcmp(geometry_type, 'shuttlecock_wing')
+    bodies = load_shuttlecock_wing(energy_accomodation);
+    showBodies(bodies, [0/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
 else
     error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
@@ -79,7 +84,7 @@ lift_to_drag_ratio_new = lift_new__N./drag_new__N;
 figure;
 hold on;
 grid on;
-plot(control_surface_angles__rad, lift_to_drag_ratio_sentman,"b", 'DisplayName', 'Sentman Model');
+plot(control_surface_angles__rad, lift_to_drag_ratio_sentman,"b", 'DisplayName', sprintf('Sentman Model \\alpha_E = %.4f',energy_accomodation));
 plot(control_surface_angles__rad, lift_to_drag_ratio_new,"r", 'DisplayName', 'New IRS Model');
 xlabel('control surface angle [rad]');
 ylabel('lift to drag ratio');
@@ -89,3 +94,16 @@ legend;
 %% Save figure as PNG and EPS
 saveas(gcf, sprintf('lift_drag_ratio_%s.png', geometry_type));
 saveas(gcf, sprintf('lift_drag_ratio_%s.eps', geometry_type), 'epsc');
+
+%% plot force envelopes for both models
+figure;
+hold on;
+grid on;
+plot3(aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1), 'b', 'DisplayName', sprintf('Sentman Model \\alpha_E = %.4f',energy_accomodation));
+plot3(aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2), 'r', 'DisplayName', 'New IRS Model');
+xlabel('X Force [N]');
+ylabel('Y Force [N]');
+zlabel('Z Force [N]');
+title(sprintf('Aerodynamic Force Envelopes for %s geometry', geometry_type));
+view([0 -1 0])
+legend;
