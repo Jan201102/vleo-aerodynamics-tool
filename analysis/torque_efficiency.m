@@ -7,8 +7,8 @@ run('environment_definitions.m');
 
 %% Geometry selection parameter
 % Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
-geometry_type = 'plate'; % Options: 'plate' or 'shuttlecock'
-energy_accommodation = 0.0;
+geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
+energy_accommodation = 0.9;
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
@@ -25,9 +25,9 @@ if strcmp(geometry_type, 'plate')
     rotation_face_index = 1;
 elseif strcmp(geometry_type, 'shuttlecock')
     bodies = load_from_gmsh(energy_accommodation);
-    showBodies(bodies, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+    showBodies(bodies, [0,0/4,pi/4,0/4,0/4], 0.75, 0.25);
     num_bodies = 5;
-    rotation_face_index = 4;
+    rotation_face_index = 3;
 elseif strcmp(geometry_type, 'shuttlecock_wing')
     bodies = load_shuttlecock_wing();
     showBodies(bodies, [0/4], 0.75, 0.25);
@@ -61,7 +61,7 @@ for i = 1:num_angles
                              bodies_rotation_angles__rad, ...
                              temperature_ratio_method,...
                              model,...
-                             2, ...
+                             1, ...
                              lut);
     end
 end
@@ -87,7 +87,7 @@ end
 
 %% plot torque efficiency
 figure;
-title(sprintf('Aerodynamic Torque efficiency for %s geometry', geometry_type));
+title(sprintf('Aerodynamic Torque efficiency for %s geometry', geometry_type),' ');
 hold on;
 grid on;
 plot(aerodynamic_torque_B_B__Nm(2,:,1), -aerodynamic_force_B__N(1,:,1), 'b', 'DisplayName', sprintf('Sentman \\alpha_E = %.2f',energy_accommodation));
@@ -103,7 +103,7 @@ saveas(gcf, sprintf('torque_efficiency_%s.eps',geometry_type), 'epsc');
 
 figure;
 tl = tiledlayout('flow');
-title(tl, sprintf('Aerodynamic Forces and Torques for %s gemoetry', geometry_type));
+title(tl, sprintf('Aerodynamic Forces and Torques for %s gemoetry', geometry_type),' ');
 ax1 = nexttile;
 grid on;
 hold on;

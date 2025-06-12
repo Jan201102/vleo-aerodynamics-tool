@@ -11,11 +11,11 @@ run('environment_definitions.m');
 %% Geometry selection parameter
 % Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
-energy_accomodation = 1;
+energy_accomodation = 0.9;
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
-lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method_sentman.csv');
+lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
 if ~isfile(lut)
     error("Look-up table file not found. Please check the path: %s", lut);
 end
@@ -28,12 +28,19 @@ if strcmp(geometry_type, 'plate')
     rotation_face_index = 1;
 elseif strcmp(geometry_type, 'shuttlecock')
     bodies = load_from_gmsh(energy_accomodation);
-    showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+    showBodies(bodies, [0,0/4,0/4,pi/4,0/4], 0.75, 0.25);
     num_bodies = 5;
-    rotation_face_index = 4;
+    rotation_face_index = 3;
 elseif strcmp(geometry_type, 'shuttlecock_wing')
-    bodies = load_shuttlecock_wing(energy_accomodation);
+    bodies = load_shuttlecock_wing();
     showBodies(bodies, [0/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+elseif strcmp(geometry_type, 'shuttlecock_wing_new')
+    bodies_all = load_from_gmsh(energy_accomodation);
+    bodies = cell(1,1);
+    bodies{1} = bodies_all{3};
+    showBodies(bodies, [pi/4], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
 else

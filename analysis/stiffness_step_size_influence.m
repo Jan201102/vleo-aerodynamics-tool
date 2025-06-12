@@ -5,7 +5,7 @@ clear;
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
-
+geometry_type = "satellite";
 %% load model data
 [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
 display(test_folder)
@@ -21,7 +21,7 @@ if strcmp(geometry_type, 'plate')
     num_bodies = 1;
     rotation_face_index = 1;
 elseif strcmp(geometry_type, 'satellite')
-    satellite = load_model();
+    satellite = load_from_gmsh();
     showBodies(satellite, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = [2,3,4,5];

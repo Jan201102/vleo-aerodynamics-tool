@@ -8,7 +8,7 @@ clear;
 run("environment_definitions.m");
 %% Geometry selection parameter
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
-energy_accommodation = 1;
+energy_accommodation = 0.9;
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
     bodies = parametrized_flat_plate(1.0, 1.0, 0.5, 0.0,energy_accommodation);
@@ -67,8 +67,9 @@ plot(control_surface_angles__rad, aero_stiffness(:,2), 'r');
 grid on;
 xlabel('Control Surface Angle [rad]');
 ylabel('Aerodynamic Stiffness [Nm/rad]');
-legend(sprintf('Sentman \alpha_E = %.2f',energy_accommodation), 'IRS model');
-title(sprintf('Aerodynamic Stiffness vs Control Surface Angle for %s geometry', geometry_type));
+legend(sprintf('Sentman \\alpha_E = %.2f',energy_accommodation), 'IRS model');
+title(sprintf('Aerodynamic Stiffness for %s geometry', geometry_type),' ');
+
 hold off;
 
 %% Save figure as PNG and EPS
