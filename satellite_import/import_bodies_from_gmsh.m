@@ -46,7 +46,8 @@ for i = 1:num_bodies
     % Transform normals from CAD to body frame (rotation only)
     normals_CAD = body_data(i).normals_CAD;
     normals_B = DCM_B_from_CAD * normals_CAD;
-    bodies{i}.normals_B = normals_B;
+    normals_norm = vecnorm(normals_B);
+    bodies{i}.normals_B = normals_B./normals_norm;
 
     % Areas (no transformation needed)
     bodies{i}.areas = body_data(i).areas_CAD;
