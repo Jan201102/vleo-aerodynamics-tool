@@ -3,33 +3,48 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
-
+set(0, 'DefaultAxesFontName', 'Times New Roman');
+set(0, 'DefaultTextFontName', 'Times New Roman');
+set(0, 'DefaultLegendFontName', 'Times New Roman');
 %load environment data
 run("environment_definitions.m");
+
 %% Geometry selection parameter
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
-energy_accommodation = 0.9;
+temperature_ratio_method = 1;
+%% load lut data
+lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+
+
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(1.0, 1.0, 0.5, 0.0,energy_accommodation);
+    bodies = parametrized_flat_plate(1, 1, 0.5, 0.0,true,energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
+    x_label = "angle of attack [°]";
 elseif strcmp(geometry_type, 'shuttlecock')
-    bodies = load_from_gmsh(energy_accommodation);
+    bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = [2,3,4,5];
+    x_label = "control surface angle [°]";
+elseif strcmp(geometry_type, 'shuttlecock_wing')
+    bodies = load_shuttlecock_wing(energy_accommodation,surface_temperature__K);
+    showBodies(bodies, [0/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+    x_label = "angle of attack [°]";
+elseif strcmp(geometry_type, 'shuttlecock_wing_new')
+    bodies_all = load_from_gmsh(energy_accommodation,surface_temperature__K);
+    bodies = cell(1,1);
+    bodies{1} = bodies_all{3};
+    showBodies(bodies, [pi/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+    x_label = "angle of attack [°]";
 else
     error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
-end
-
-%% load model data
-[test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
-display(test_folder)
-lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
-if ~isfile(lut)
-    error("Look-up table file not found. Please check the path: %s", lut);
 end
 
 %% Derivation Configuration
@@ -55,20 +70,20 @@ for model = 1:2
                                                                 bodies, ...
                                                                 bodies_rotation_angles__rad, ...
                                                                 model, ...
-                                                                lut);
+                                                                lut_data);
+        fprintf('calcluated point %d of %d\n',i+(model-1)*num_angles,2*num_angles);
     end
 end
 
 %% plot stiffness of control surface angle for both models in two subplots with a tiled layout
 figure;
-plot(control_surface_angles__rad, aero_stiffness(:,1), 'b');
+plot(rad2deg(control_surface_angles__rad), aero_stiffness(:,1), 'b');
 hold on;
-plot(control_surface_angles__rad, aero_stiffness(:,2), 'r');
+plot(rad2deg(control_surface_angles__rad), aero_stiffness(:,2), 'r');
 grid on;
-xlabel('Control Surface Angle [rad]');
+xlabel(x_label);
 ylabel('Aerodynamic Stiffness [Nm/rad]');
-legend(sprintf('Sentman \\alpha_E = %.2f',energy_accommodation), 'IRS model');
-title(sprintf('Aerodynamic Stiffness for %s geometry', geometry_type),' ');
+legend(sprintf('Sentman \\alpha_E = %.4f',energy_accommodation), 'IRS model');
 
 hold off;
 

@@ -5,32 +5,46 @@ clear;
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
-geometry_type = "satellite";
-%% load model data
-[test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
-display(test_folder)
-lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
-if ~isfile(lut)
-    error("Look-up table file not found. Please check the path: %s", lut);
-end
+%% Geometry selection parameter
+geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
+temperature_ratio_method = 1;
+
+%% load lut data
+lut_data = load_lut("aerodynamic_coefficients_fitted_highres.csv");
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    satellite = parametrized_flat_plate(1.0, 1.0, 0.5, 0.0);
-    showBodies(satellite, [0], 0.75, 0.25);
+    bodies = parametrized_flat_plate(1, 1, 0.5, 0.0,true,energy_accommodation,surface_temperature__K);
+    showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
-elseif strcmp(geometry_type, 'satellite')
-    satellite = load_from_gmsh();
-    showBodies(satellite, [0,0/4,pi/4,pi/4,pi/4], 0.75, 0.25);
+    x_label = "angle of attack [deg]";
+elseif strcmp(geometry_type, 'shuttlecock')
+    bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
+    showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = [2,3,4,5];
+    x_label = "control surface angle [deg]";
+elseif strcmp(geometry_type, 'shuttlecock_wing')
+    bodies = load_shuttlecock_wing(energy_accommodation,surface_temperature__K);
+    showBodies(bodies, [0/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+    x_label = "angle of attack [deg]";
+elseif strcmp(geometry_type, 'shuttlecock_wing_new')
+    bodies_all = load_from_gmsh(energy_accommodation,surface_temperature__K);
+    bodies = cell(1,1);
+    bodies{1} = bodies_all{3};
+    showBodies(bodies, [pi/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+    x_label = "angle of attack [deg]";
 else
-    error("Invalid geometry_type. Use 'plate' or 'satellite'.");
+    error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
 
 %% Define delta_alpha values to analyze
-delta_alphas = [1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]; % radians (reduced range for angle sweep)
+delta_alphas = [1e-4, 1e-3, 1e-2,1e-1]; % radians (reduced range for angle sweep)
 num_deltas = length(delta_alphas);
 
 % Define test angle - only evaluate at 0 degrees for initial analysis
@@ -69,10 +83,11 @@ for delta_idx = 1:num_deltas
             try
                 stiffness = calculate_aerodynamic_stiffness(...
                     method, delta, axis_dir_B, component, ...
-                    satellite, bodies_rotation_angles__rad, model, lut);
+                    bodies, bodies_rotation_angles__rad, model, lut_data);
                 stiffness_vs_angle(angle_idx, delta_idx, method_idx) = stiffness;
             catch ME
                 % Silently handle errors for cleaner output
+                disp(ME.message)
                 stiffness_vs_angle(angle_idx, delta_idx, method_idx) = NaN;
             end
         end
@@ -120,3 +135,22 @@ title('Average Absolute Changes in Stiffness vs Delta Alpha');
 legend('Location', 'best');
 set(gca, 'XScale', 'log');
 set(gca, 'YScale', 'log');
+%% plot stiffness vs control surface angle for each method in a tiled layout
+figure();
+tl = tiledlayout(num_methods, 1, 'TileSpacing', 'compact');
+for method_idx = 1:num_methods
+    nexttile;
+    hold on;
+    grid on;
+    
+    for delta_idx = 1:num_deltas
+        plot(control_surface_angles__rad, ...
+             squeeze(stiffness_vs_angle(:, delta_idx, method_idx)), ...
+             'DisplayName', sprintf('Delta = %.2e rad', delta_alphas(delta_idx)));
+    end
+    
+    title(sprintf('Stiffness vs Control Surface Angle (%s)', methods{method_idx}));
+    xlabel(x_label);
+    ylabel('Aerodynamic Stiffness [Nm/rad]');
+    legend('Location', 'best');
+end

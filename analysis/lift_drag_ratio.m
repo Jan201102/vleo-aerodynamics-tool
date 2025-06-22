@@ -4,45 +4,48 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
+set(0, 'DefaultAxesFontName', 'Times New Roman');
+set(0, 'DefaultTextFontName', 'Times New Roman');
+set(0, 'DefaultLegendFontName', 'Times New Roman');
 
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
 %% Geometry selection parameter
 % Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
-geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
-energy_accomodation = 0.9;
-%% load model data
-[test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
-display(test_folder)
-lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
-if ~isfile(lut)
-    error("Look-up table file not found. Please check the path: %s", lut);
-end
+geometry_type = 'plate'; % Options: 'plate' or 'shuttlecock'
+temperature_ratio_method = 1;
+
+%% load lut data
+lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(0.13333, 0.098, 0.0, 0.0,true,energy_accomodation);
+    bodies = parametrized_flat_plate(1, 1, 0.0, 0.0,true,energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
+    x_label = "angle of attack [°]";
 elseif strcmp(geometry_type, 'shuttlecock')
-    bodies = load_from_gmsh(energy_accomodation);
+    bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0,0/4,0/4,pi/4,0/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = 3;
+    x_label = "control surface angle [°]";
 elseif strcmp(geometry_type, 'shuttlecock_wing')
-    bodies = load_shuttlecock_wing();
+    bodies = load_shuttlecock_wing(energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0/4], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
+    x_label = "angle of attack [°]";
 elseif strcmp(geometry_type, 'shuttlecock_wing_new')
-    bodies_all = load_from_gmsh(energy_accomodation);
+    bodies_all = load_from_gmsh(energy_accommodation,surface_temperature__K);
     bodies = cell(1,1);
     bodies{1} = bodies_all{3};
     showBodies(bodies, [pi/4], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
+    x_label = "angle of attack [°]";
 else
     error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
@@ -59,7 +62,7 @@ for model = 1:2
         current_angle = control_surface_angles__rad(i);
         bodies_rotation_angles__rad = zeros(1, num_bodies);
         bodies_rotation_angles__rad(rotation_face_index) = current_angle;
-        [aerodynamic_force_B__N(:,i,model), ~] = ...
+        [aerodynamic_force_B__N(:,i,model), ~,~,~] = ...
             vleoAerodynamics(...
                 attitude_quarternion_BI,...
                 rotational_velocity_BI_B__rad_per_s,...
@@ -72,8 +75,7 @@ for model = 1:2
                 bodies_rotation_angles__rad,...
                 temperature_ratio_method,...
                 model,...
-                1,...
-                lut);
+                lut_data);
     end
 end
 
@@ -91,11 +93,10 @@ lift_to_drag_ratio_new = lift_new__N./drag_new__N;
 figure;
 hold on;
 grid on;
-plot(control_surface_angles__rad, lift_to_drag_ratio_sentman,"b", 'DisplayName', sprintf('Sentman Model \\alpha_E = %.4f',energy_accomodation));
-plot(control_surface_angles__rad, lift_to_drag_ratio_new,"r", 'DisplayName', 'New IRS Model');
-xlabel('control surface angle [rad]');
+plot(rad2deg(control_surface_angles__rad), lift_to_drag_ratio_sentman,"b", 'DisplayName', sprintf('Sentman Model \\alpha_E = %.4f',energy_accommodation));
+plot(rad2deg(control_surface_angles__rad), lift_to_drag_ratio_new,"r", 'DisplayName', 'New IRS Model');
+xlabel(x_label);
 ylabel('lift to drag ratio');
-title(sprintf('Lift to Drag Ratio Comparison for %s geometry',geometry_type));
 legend;
 
 %% Save figure as PNG and EPS
@@ -106,7 +107,7 @@ saveas(gcf, sprintf('lift_drag_ratio_%s.eps', geometry_type), 'epsc');
 figure;
 hold on;
 grid on;
-plot3(aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1), 'b', 'DisplayName', sprintf('Sentman Model \\alpha_E = %.4f',energy_accomodation));
+plot3(aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1), 'b', 'DisplayName', sprintf('Sentman Model \\alpha_E = %.4f',energy_accommodation));
 plot3(aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2), 'r', 'DisplayName', 'New IRS Model');
 xlabel('X Force [N]');
 ylabel('Y Force [N]');

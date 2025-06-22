@@ -1,36 +1,41 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
-
+set(0, 'DefaultAxesFontName', 'Times New Roman');
+set(0, 'DefaultTextFontName', 'Times New Roman');
+set(0, 'DefaultLegendFontName', 'Times New Roman');
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
 %% Geometry selection parameter
 % Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
-energy_accommodation = 0.9;
+temperature_ratio_method = 1;
+
 %% load model data
-[test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
-display(test_folder)
-lut = fullfile(test_folder, 'aerodynamic_coefficients_panel_method.csv');
-if ~isfile(lut)
-    error("Look-up table file not found. Please check the path: %s", lut);
-end
+lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(0.13333333, 0.098, 0.07, 0.0,false,energy_accommodation);
+    bodies = parametrized_flat_plate(1, 1, 0.5, 0.0,true,energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
 elseif strcmp(geometry_type, 'shuttlecock')
-    bodies = load_from_gmsh(energy_accommodation);
+    bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0,0/4,pi/4,0/4,0/4], 0.75, 0.25);
     num_bodies = 5;
     rotation_face_index = 3;
 elseif strcmp(geometry_type, 'shuttlecock_wing')
-    bodies = load_shuttlecock_wing();
+    bodies = load_shuttlecock_wing(energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0/4], 0.75, 0.25);
+    num_bodies = 1;
+    rotation_face_index = 1;
+elseif strcmp(geometry_type, 'shuttlecock_wing_new')
+    bodies_all = load_from_gmsh(energy_accommodation,surface_temperature__K);
+    bodies = cell(1,1);
+    bodies{1} = bodies_all{3};
+    showBodies(bodies, [pi/4], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
 else
@@ -42,6 +47,8 @@ num_angles = 101;
 control_surface_angles__rad = linspace(0, pi/2, num_angles);
 aerodynamic_force_B__N = nan(3, num_angles, 2);
 aerodynamic_torque_B_B__Nm = aerodynamic_force_B__N;
+aerodynamic_forces_B__N = nan(3,num_bodies,num_angles,2);
+aerodynmaic_torques_B_B__Nm = aerodynamic_forces_B__N;
 attitude_quaternion_BI = [1; 0; 0; 0];
 for i = 1:num_angles
     for model = 1:2
@@ -49,48 +56,46 @@ for i = 1:num_angles
         bodies_rotation_angles__rad = zeros(1, num_bodies);
         bodies_rotation_angles__rad(rotation_face_index) = current_angle;
         [aerodynamic_force_B__N(:,i,model), ...
-            aerodynamic_torque_B_B__Nm(:,i,model)] = ...
-            vleoAerodynamics(attitude_quaternion_BI, ...
-                             rotational_velocity_BI_B__rad_per_s, ...
-                             velocity_I_I__m_per_s, ...
-                             wind_velocity_I_I__m_per_s, ...
-                             density__kg_per_m3, ...
-                             temperature__K, ... 
-                             particles_mass__kg, ...
-                             bodies, ...                                                       
-                             bodies_rotation_angles__rad, ...
-                             temperature_ratio_method,...
-                             model,...
-                             1, ...
-                             lut);
+        aerodynamic_torque_B_B__Nm(:,i,model),...
+        aerodynamic_forces_B__N(:,:,i,model),...
+        aerodynmaic_torques_B_B__Nm(:,:,i,model)] = ...
+        vleoAerodynamics(attitude_quaternion_BI, ...
+                            rotational_velocity_BI_B__rad_per_s, ...
+                            velocity_I_I__m_per_s, ...
+                            wind_velocity_I_I__m_per_s, ...
+                            density__kg_per_m3, ...
+                            temperature__K, ... 
+                            particles_mass__kg, ...
+                            bodies, ...                                                       
+                            bodies_rotation_angles__rad, ...
+                            temperature_ratio_method,...
+                            model,...
+                            lut_data);
     end
 end
 %% plot force envelopes for each bodie in a subplot with tiled layout
-if ndims(aerodynamic_torque_B_B__Nm) == 4
-    figure;
-    tl = tiledlayout('flow');
-    title(tl, sprintf('Aerodynamic Forces for %s geometry', geometry_type));
-    for b = 1:num_bodies
-        ax = nexttile;
-        grid on;
-        hold on;
-        title(ax, sprintf('Body %d', b));
-        xlabel("x");
-        ylabel("y");
-        zlabel("z [N]");
-        plot3(ax, squeeze(aerodynamic_force_B__N(1,b,:,1)), squeeze(aerodynamic_force_B__N(2,b,:,1)), squeeze(aerodynamic_force_B__N(3,b,:,1)), "b-o", 'DisplayName', 'Sentman');
-        plot3(ax, squeeze(aerodynamic_force_B__N(1,b,:,2)), squeeze(aerodynamic_force_B__N(2,b,:,2)), squeeze(aerodynamic_force_B__N(3,b,:,2)), "r-o", 'DisplayName', 'IRS');
-        legend(ax,"location","northwest");
-        view(ax, [0 -1 0]);
-    end
+figure;
+tl = tiledlayout('flow');
+title(tl, sprintf('Aerodynamic Forces for %s geometry', geometry_type));
+for b = 1:num_bodies
+    ax = nexttile;
+    grid on;
+    hold on;
+    title(ax, sprintf('Body %d', b));
+    xlabel("x");
+    ylabel("y");
+    zlabel("z [N]");
+    plot3(ax, squeeze(aerodynamic_forces_B__N(1,b,:,1)), squeeze(aerodynamic_forces_B__N(2,b,:,1)), squeeze(aerodynamic_forces_B__N(3,b,:,1)), "b-o", 'DisplayName', 'Sentman');
+    plot3(ax, squeeze(aerodynamic_forces_B__N(1,b,:,2)), squeeze(aerodynamic_forces_B__N(2,b,:,2)), squeeze(aerodynamic_forces_B__N(3,b,:,2)), "r-o", 'DisplayName', 'IRS');
+    legend(ax,"location","northeast");
+    view(ax, [0 -1 0]);
 end
 
 %% plot torque efficiency
 figure;
-title(sprintf('Aerodynamic Torque efficiency for %s geometry', geometry_type),' ');
 hold on;
 grid on;
-plot(aerodynamic_torque_B_B__Nm(2,:,1), -aerodynamic_force_B__N(1,:,1), 'b', 'DisplayName', sprintf('Sentman \\alpha_E = %.2f',energy_accommodation));
+plot(aerodynamic_torque_B_B__Nm(2,:,1), -aerodynamic_force_B__N(1,:,1), 'b', 'DisplayName', sprintf('Sentman \\alpha_E = %.4f',energy_accommodation));
 plot(aerodynamic_torque_B_B__Nm(2,:,2), -aerodynamic_force_B__N(1,:,2), 'r', 'DisplayName', 'IRS model');
 xlabel('pitch Torque [Nm]');
 ylabel('Drag [N]');
