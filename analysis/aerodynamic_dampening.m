@@ -87,5 +87,5 @@ legend(sprintf('Sentman \\alpha_E = %.4f',energy_accommodation), 'IRS model');
 hold off;
 
 %% Save figure as PNG and EPS
-saveas(gcf, sprintf('aerodynamic_stiffness_%s.png', geometry_type));
-saveas(gcf, sprintf('aerodynamic_stiffness_%s.eps', geometry_type), 'epsc');
+saveas(gcf, sprintf('aerodynamic_dampening_%s.png', geometry_type));
+saveas(gcf, sprintf('aerodynamic_dampening_%s.eps', geometry_type), 'epsc');

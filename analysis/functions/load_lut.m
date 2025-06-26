@@ -7,7 +7,9 @@ function lut = load_lut(lut_file)
     % Returns:
     %   lut (struct): The loaded lookup table.
 
-    [parent_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
+    %[parent_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
+    [parent_folder,~,~] = fileparts(mfilename('fullpath'));
+    parent_folder = fullfile(parent_folder, '..');
     display(parent_folder)
     lut_path = fullfile(parent_folder,lut_file);
     if ~isfile(lut_path)
