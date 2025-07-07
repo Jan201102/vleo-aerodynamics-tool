@@ -1,9 +1,6 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
-set(0, 'DefaultAxesFontName', 'Times New Roman');
-set(0, 'DefaultTextFontName', 'Times New Roman');
-set(0, 'DefaultLegendFontName', 'Times New Roman');
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
@@ -102,8 +99,7 @@ ylabel('Drag [N]');
 legend('Location', 'northwest');
 
 %% Save figure as PNG and EPS
-saveas(gcf, sprintf('torque_efficiency_%s.png', geometry_type));
-saveas(gcf, sprintf('torque_efficiency_%s.eps',geometry_type), 'epsc');
+matlab2tikz(sprintf('torque_efficiency_%s.tex', geometry_type));
 %% plot force envelope
 
 figure;

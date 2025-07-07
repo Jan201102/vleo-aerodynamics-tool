@@ -1,11 +1,10 @@
-function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided,energy_accommodation_coefficient,surface_temp__K)
+function bodies = parametrized_flat_plate(x_dim, y_dim, cog, two_sided,energy_accommodation_coefficient,surface_temp__K)
     % CREATE_FLAT_PLATE Creates a flat plate body structure
     %
     % Inputs:
     %   x_dim - dimension in x direction (width)
     %   y_dim - dimension in y direction (height)
-    %   cog_x - x coordinate of center of gravity in CAD system
-    %   cog_y - y coordinate of center of gravity in CAD system
+    %   cog - 3x1 coordinates of center of gravity in CAD system
     %   two_sided - logical, true for two-sided plate, false for one-sided (optional, default: true)
     %
     % Output:
@@ -13,8 +12,7 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided,
     arguments
         x_dim (1,1) double {mustBePositive} = 1.0; % Width of the plate
         y_dim (1,1) double {mustBePositive} = 1.0; % Height of the plate
-        cog_x (1,1) double = 0.0; % Center of gravity x coordinate in CAD system
-        cog_y (1,1) double = 0.0; % Center of gravity y coordinate in CAD system
+        cog (3,1) double = [0;0;0]; % Center of gravity coordinate in CAD system
         two_sided (1,1) logical = true; % Two-sided plate flag
         energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
         surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
@@ -40,23 +38,23 @@ function bodies = parametrized_flat_plate(x_dim, y_dim, cog_x, cog_y, two_sided,
     
     % Bottom face triangles (normal pointing in -z direction)
     % CAD vertices transformed to body frame
-    body.vertices_B(:,:,1) = [-half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
-                              -half_y - cog_y, -half_y - cog_y,  half_y - cog_y;
-                              -1e-10, -1e-10, -1e-10];
+    body.vertices_B(:,:,1) = [-half_x,  half_x, -half_x;
+                              -half_y, -half_y,  half_y;
+                              -1e-10, -1e-10, -1e-10] - cog ;
     
-    body.vertices_B(:,:,2) = [ half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
-                              -half_y - cog_y,  half_y - cog_y,  half_y - cog_y;
-                              -1e-10, -1e-10, -1e-10];
+    body.vertices_B(:,:,2) = [ half_x ,  half_x , -half_x ;
+                              -half_y ,  half_y ,  half_y ;
+                              -1e-10, -1e-10, -1e-10]- cog ;
     
     if two_sided
         % Top face triangles (normal pointing in +z direction)
-        body.vertices_B(:,:,3) = [-half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
-                                  -half_y - cog_y, -half_y - cog_y,  half_y - cog_y;
-                                   1e-10,  1e-10,  1e-10];
+        body.vertices_B(:,:,3) = [-half_x ,  half_x , -half_x ;
+                                  -half_y , -half_y ,  half_y ;
+                                   1e-10,  1e-10,  1e-10]- cog ;
         
-        body.vertices_B(:,:,4) = [ half_x - cog_x,  half_x - cog_x, -half_x - cog_x;
-                                  -half_y - cog_y,  half_y - cog_y,  half_y - cog_y;
-                                   1e-10,  1e-10,  1e-10];
+        body.vertices_B(:,:,4) = [ half_x ,  half_x , -half_x ;
+                                  -half_y ,  half_y ,  half_y ;
+                                   1e-10,  1e-10,  1e-10]- cog;
     end
     
     % Calculate centroids

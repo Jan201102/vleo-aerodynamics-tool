@@ -20,7 +20,7 @@ function stiffness = calculate_aerodynamic_stiffness(method, delta__rad, axis_di
 %   bodies: cell array of body structures containing aerodynamic properties
 %   bodies_rotation_angles__rad: 1xN vector of rotation angles for each body in radians
 %   model: integer specifying the aerodynamic model to use
-%   lut_data: lookup table data for aerodynamic coefficients
+%   lut_data: lookup table data of type 'griddedInterpolant' for aerodynamic coefficients
 %
 % Outputs:
 %   stiffness: scalar value representing the aerodynamic stiffness for the specified method
@@ -33,7 +33,7 @@ function stiffness = calculate_aerodynamic_stiffness(method, delta__rad, axis_di
         bodies (1,:) cell {mustBeNonempty};  % Cell array of body structures
         bodies_rotation_angles__rad (1,:) {mustBeNumeric, mustBeReal};  % Rotation angles for each body in radians
         model (1,1) {mustBeNumeric, mustBeReal, mustBeInteger, mustBePositive};  % Aerodynamic model index
-        lut_data (:,5) {mustBeNumeric, mustBeReal}; % lookup table data for aerodynamic coefficients
+        lut_data; % lookup table data for aerodynamic coefficients
     end
 
     switch method

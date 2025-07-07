@@ -4,10 +4,6 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
-set(0, 'DefaultAxesFontName', 'Times New Roman');
-set(0, 'DefaultTextFontName', 'Times New Roman');
-set(0, 'DefaultLegendFontName', 'Times New Roman');
-
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
 
@@ -18,10 +14,9 @@ temperature_ratio_method = 1;
 
 %% load lut data
 lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
-
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(1, 1, 0.0, 0.0,true,energy_accommodation,surface_temperature__K);
+    bodies = parametrized_flat_plate(1, 1, [0,0,0],true,energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
@@ -100,8 +95,7 @@ ylabel('lift to drag ratio');
 legend;
 
 %% Save figure as PNG and EPS
-saveas(gcf, sprintf('lift_drag_ratio_%s.png', geometry_type));
-saveas(gcf, sprintf('lift_drag_ratio_%s.eps', geometry_type), 'epsc');
+matlab2tikz(sprintf('lift_drag_ratio_%s.tex', geometry_type));
 
 %% plot force envelopes for both models
 figure;

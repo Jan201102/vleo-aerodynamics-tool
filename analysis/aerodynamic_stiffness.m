@@ -3,9 +3,6 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
-set(0, 'DefaultAxesFontName', 'Times New Roman');
-set(0, 'DefaultTextFontName', 'Times New Roman');
-set(0, 'DefaultLegendFontName', 'Times New Roman');
 %load environment data
 run("environment_definitions.m");
 
@@ -88,5 +85,4 @@ legend(sprintf('Sentman \\alpha_E = %.4f',energy_accommodation), 'IRS model');
 hold off;
 
 %% Save figure as PNG and EPS
-saveas(gcf, sprintf('aerodynamic_stiffness_%s.png', geometry_type));
-saveas(gcf, sprintf('aerodynamic_stiffness_%s.eps', geometry_type), 'epsc');
+matlab2tikz(sprintf('aerodynamic_stiffness_%s.tex', geometry_type));

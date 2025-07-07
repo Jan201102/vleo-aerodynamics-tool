@@ -19,7 +19,7 @@ function dampening = calculate_aerodynamic_dampening(method, delta__rad_per_s, c
 %   bodies: cell array of body structures containing aerodynamic properties
 %   bodies_rotation_angles__rad: 1xN vector of rotation angles for each body in radians
 %   model: integer specifying the aerodynamic model to use
-%   lut_data: lookup table data for aerodynamic coefficients
+%   lut_data: gridded interpolant for LUT data
 %
 % Outputs:
 %   dampening: scalar value representing the aerodynamic dampening for the specified method
@@ -31,7 +31,7 @@ function dampening = calculate_aerodynamic_dampening(method, delta__rad_per_s, c
         bodies (1,:) cell {mustBeNonempty};  % Cell array of body structures
         bodies_rotation_angles__rad (1,:) {mustBeNumeric, mustBeReal};  % Rotation angles for each body in radians
         model (1,1) {mustBeNumeric, mustBeReal, mustBeInteger, mustBePositive};  % Aerodynamic model index
-        lut_data (:,5) {mustBeNumeric, mustBeReal}; % lookup table data for aerodynamic coefficients
+        lut_data ; % lookup table data for aerodynamic coefficients
     end
     switch method
         case 'central'

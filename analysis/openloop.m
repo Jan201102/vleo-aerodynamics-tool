@@ -26,7 +26,7 @@ delta_alpha = 1e-4;                  % Step size for numerical differentiation
 axis_direction = [0; 1; 0];               % Rotation axis (y-axis for pitch)
 torque_component = 2;                      % Component index (2 = y-component for pitch)
 
-%% calculate aerodynamic stiffness
+%% calculate aerodynamic stiffness and dampening
 num_angles = 101;
 control_surface_angles__rad = linspace(0, pi/2, num_angles);
 ol_parameters = zeros(num_angles,2,2);
@@ -57,28 +57,31 @@ for model = 1:2
         fprintf('calcluated point %d of %d\n',i+(model-1)*num_angles,2*num_angles);
     end
 end
-
+%% save calculted ol parameters
+save("ol_parameters.mat","ol_parameters","control_surface_angles__rad")
 %% plot omega_0 and zeta in tiled layout
 figure;
 t = tiledlayout(2,1);
 nexttile;
-plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,1,1)));
+plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,1,1)),"b-");
 hold on;
-plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,2,1)));
+plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,2,1)),"r-");
 grid on;
 xlabel(x_label);
 ylabel('Eigenfrequenz \omega_0 [rad/s]');
 title('Eigenfrequenz \omega_0 für verschiedene Modelle');
-legend("Sentman","IRS");
+legend("Sentman","IRS","Location","southeast");
 nexttile;
-plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,1,2)));
+plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,1,2)),"b-");
 hold on;
-plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,2,2)));
+plot(control_surface_angles__rad * 180 / pi, squeeze(ol_parameters(:,2,2)),"r-");
 grid on;
 xlabel(x_label);
 ylabel('Dämpfungsgrad \zeta [-]');
 title('Dämpfungsgrad \zeta für verschiedene Modelle');
-legend("Sentman","IRS");
+legend("Sentman","IRS","Location","southeast");
+%%
+matlab2tikz('ol_parameters_shuttlecock.tex');
 %%
 plot_solution_at_angle(deg2rad(45));
 %%
