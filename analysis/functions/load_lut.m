@@ -16,7 +16,7 @@ function lut = load_lut(lut_file)
         error("Look-up table file not found. Please check the path: %s", lut_path);
     end
     lut = readmatrix(lut_path);
-    lut = griddedInterpolant(lut(:,1), lut(:,2:5));
+    lut = griddedInterpolant(lut(:,1), lut(:,2:3),"spline");
 end
 
     

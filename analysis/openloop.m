@@ -3,21 +3,18 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
-set(0, 'DefaultAxesFontName', 'Times New Roman');
-set(0, 'DefaultTextFontName', 'Times New Roman');
-set(0, 'DefaultLegendFontName', 'Times New Roman');
 %load environment data
 run("environment_definitions.m");
 
 %% load lut data
-lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+lut_data = load_lut("aerodynamic_coefficients_panel_method_clean.csv");
 
 bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
 showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
 num_bodies = 5;
 rotation_face_index = [2,3,4,5];
 x_label = "control surface angle [°]";
-I_yy = 0.0075833; % Moment of inertia around y-axis
+I_yy = 0.0375; % Moment of inertia around y-axis
 
 %% Derivation Configuration
 derivation_method = 'central';  % Options: 'central', 'five_point_stencil', 'seven_point_stencil', 'forward', 'backward'
@@ -44,6 +41,7 @@ for model = 1:2
                                                 model, ...
                                                 lut_data);
         C_M_a = calculate_aerodynamic_stiffness(derivation_method, ...
+                                                0,...
                                                 delta_alpha, ...
                                                 axis_direction,...
                                                 torque_component, ...

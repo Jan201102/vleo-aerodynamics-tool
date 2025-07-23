@@ -4,32 +4,35 @@ import vleo_aerodynamics_core.*;
 run("environment_definitions.m");
 
 %load bodies
-% bodies = load_box(...
-%     energy_accommodation,...
-%     surface_temperature__K...
-% );
+%bodies = load_box(...
+%    energy_accommodation,...
+%    surface_temperature__K...
+%);
 
-bodies = parametrized_flat_plate(...
-    1, 1,...
-    [0;0;0.5],...
-    false,energy_accommodation,surface_temperature__K);
-% bodies = load_box_truncated(...
-%     energy_accommodation,...
-%     surface_temperature__K...
-% );
+% bodies = parametrized_flat_plate(...
+%     1, 1,...
+%     [0.5;0;0],...
+%     false,energy_accommodation,surface_temperature__K);
+ bodies = load_box_truncated(...
+     energy_accommodation,...
+     surface_temperature__K...
+ );
+ bodies_label = ["bottom","left","top","right","back","front"]
 num_bodies = length(bodies);
 
 %load lut data
-lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+%lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+lut_data = load_lut("aerodynamic_coefficients_fitted_highres_sentman.csv");
+%%
 
 showBodies(bodies,[0,0,0,0,0,0])
 
 %% Calculate torque curves
 
 % Set control surface angles to 0 for shuttlecock geometry
-bodies_rotation_angles = [0,0,0,0,0,0];
+bodies_rotation_angles = pi/2 * zeros(num_bodies);
 num_pitch_angles = 101;
-pitch_angles__rad = linspace(0, -pi/2, num_pitch_angles);
+pitch_angles__rad = linspace(-pi/5000, pi/5000, num_pitch_angles);
 %pitch_angles__rad = [pi/8];
 torques = zeros(num_pitch_angles, 2,3,num_bodies); % 2 models
 total_torques = zeros(num_pitch_angles, 2,3); % 2 models
@@ -38,10 +41,10 @@ axis_direction = [0; 1; 0]; % Rotation axis (y-axis for pitch)
 for model = 1:2
     for i = 1:num_pitch_angles
         pitch_angle = pitch_angles__rad(i);
-        
+        %bodies_rotation_angles = [pitch_angle];
         % Calculate torque for shuttlecock geometry
         attitude_quaternion_BI = [cos(pitch_angle/2); sin(pitch_angle/2) * axis_direction];
-        
+        %attitude_quaternion_BI = [1;0;0;0];
         [~, total_torque_vec,~,torque_vec] = vleoAerodynamics(...
             attitude_quaternion_BI,...
             rotational_velocity_BI_B__rad_per_s,...
@@ -69,9 +72,9 @@ for i = 1:num_bodies
     plot(rad2deg(pitch_angles__rad), torques(:,2,2,i), 'r-', 'LineWidth', 2);
     
     grid on;
-    xlabel('Pitch Angle [°]');
-    ylabel('Pitch Torque [Nm]');
-    title(['Body ', num2str(i)]);
+    xlabel('global Pitch Angle [°]');
+    ylabel('local Pitch Torque [Nm]');
+    title(bodies_label(i));
 end
 %% Plot results
 c_total_torques = squeeze(sum(torques, 4)); % Sum over all bodies

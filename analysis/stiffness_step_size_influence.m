@@ -44,7 +44,7 @@ else
 end
 
 %% Define delta_alpha values to analyze
-delta_alphas = [1e-4, 1e-3, 1e-2,1e-1]; % radians (reduced range for angle sweep)
+delta_alphas = [1e-4,1e-3,1e-2,1e-1,1,1e1,1e2,1e3,1e4]; % radians (reduced range for angle sweep)
 num_deltas = length(delta_alphas);
 
 % Define test angle - only evaluate at 0 degrees for initial analysis
@@ -81,9 +81,11 @@ for delta_idx = 1:num_deltas
             method = methods{method_idx};
             
             try
-                stiffness = calculate_aerodynamic_stiffness(...
-                    method, delta, axis_dir_B, component, ...
-                    bodies, bodies_rotation_angles__rad, model, lut_data);
+                %stiffness = calculate_aerodynamic_stiffness(...
+                 %   method, delta, axis_dir_B, component, ...
+                  %  bodies, bodies_rotation_angles__rad, model, lut_data);
+                stiffness = calculate_aerodynamic_dampening(method,delta,...
+                    component,bodies,bodies_rotation_angles__rad,model,lut_data);
                 stiffness_vs_angle(angle_idx, delta_idx, method_idx) = stiffness;
             catch ME
                 % Silently handle errors for cleaner output
@@ -137,8 +139,8 @@ set(gca, 'XScale', 'log');
 set(gca, 'YScale', 'log');
 %% plot stiffness vs control surface angle for each method in a tiled layout
 figure();
-tl = tiledlayout(num_methods, 1, 'TileSpacing', 'compact');
-for method_idx = 1:num_methods
+tl = tiledlayout(1, 1, 'TileSpacing', 'compact');
+for method_idx = 1:1
     nexttile;
     hold on;
     grid on;
