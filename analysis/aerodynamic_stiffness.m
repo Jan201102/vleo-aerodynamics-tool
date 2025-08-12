@@ -5,14 +5,11 @@ addpath("analysis/functions");
 clear;
 %load environment data
 run("environment_definitions.m");
-
 %% Geometry selection parameter
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
 temperature_ratio_method = 1;
 %% load lut data
-lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
-
-
+lut_data = load("aerodynamic_coefficients_panel_method_poly.mat");
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
     bodies = parametrized_flat_plate(1, 1, 0.5, 0.0,true,energy_accommodation,surface_temperature__K);
@@ -40,6 +37,13 @@ elseif strcmp(geometry_type, 'shuttlecock_wing_new')
     num_bodies = 1;
     rotation_face_index = 1;
     x_label = "angle of attack [°]";
+elseif strcmp(geometry_type,'box')
+    bodies = load_box(energy_accommodation,surface_temperature__K);
+    showBodies(bodies,[0]);
+    num_bodies = 1;
+    x_label = "angle of attack [°]";
+    rotation_face_index = 1
+
 else
     error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
@@ -51,16 +55,16 @@ axis_direction = [0; 1; 0];               % Rotation axis (y-axis for pitch)
 torque_component = 2;                      % Component index (2 = y-component for pitch)
 
 %% calculate aerodynamic stiffness
-num_angles = 101;
-control_surface_angles__rad = linspace(0, pi/2, num_angles);
+num_angles = 100;
+control_surface_angles__rad = linspace(0,pi/2, num_angles);
 aero_stiffness = zeros(num_angles,2);
 for model = 1:2
     for i = 1:num_angles
         current_angle = control_surface_angles__rad(i);
         bodies_rotation_angles__rad = zeros(1, num_bodies);
         bodies_rotation_angles__rad(rotation_face_index) = current_angle;
-        
         aero_stiffness(i,model) = calculate_aerodynamic_stiffness(derivation_method, ...
+                                                                0,...
                                                                 delta_alpha, ...
                                                                 axis_direction, ...
                                                                 torque_component, ...
@@ -71,7 +75,7 @@ for model = 1:2
         fprintf('calcluated point %d of %d\n',i+(model-1)*num_angles,2*num_angles);
     end
 end
-
+save("aerodynamic_stiffness_shuttlecock.mat","control_surface_angles__rad","aero_stiffness")
 %% plot stiffness of control surface angle for both models in two subplots with a tiled layout
 figure;
 plot(rad2deg(control_surface_angles__rad), aero_stiffness(:,1), 'b');
@@ -80,7 +84,7 @@ plot(rad2deg(control_surface_angles__rad), aero_stiffness(:,2), 'r');
 grid on;
 xlabel(x_label);
 ylabel('Aerodynamic Stiffness [Nm/rad]');
-legend(sprintf('Sentman \\alpha_E = %.4f',energy_accommodation), 'IRS model');
+legend(sprintf('Sentman \\alpha_E = %.4f',energy_accommodation), 'IRS model',"Location","best");
 
 hold off;
 

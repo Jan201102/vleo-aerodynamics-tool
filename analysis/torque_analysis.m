@@ -21,8 +21,7 @@ run("environment_definitions.m");
 num_bodies = length(bodies);
 
 %load lut data
-%lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
-lut_data = load_lut("aerodynamic_coefficients_fitted_highres_sentman.csv");
+lut_data = load("aerodynamic_coefficients_panel_method_poly.mat");
 %%
 
 showBodies(bodies,[0,0,0,0,0,0])
@@ -32,7 +31,7 @@ showBodies(bodies,[0,0,0,0,0,0])
 % Set control surface angles to 0 for shuttlecock geometry
 bodies_rotation_angles = pi/2 * zeros(num_bodies);
 num_pitch_angles = 101;
-pitch_angles__rad = linspace(-pi/5000, pi/5000, num_pitch_angles);
+pitch_angles__rad = linspace(-pi/4, pi/4, num_pitch_angles);
 %pitch_angles__rad = [pi/8];
 torques = zeros(num_pitch_angles, 2,3,num_bodies); % 2 models
 total_torques = zeros(num_pitch_angles, 2,3); % 2 models

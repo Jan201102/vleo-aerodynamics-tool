@@ -10,7 +10,7 @@ geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
 temperature_ratio_method = 1;
 
 %% load model data
-lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+lut_data = load_lut("aerodynamic_coefficients_panel_method_clean.csv");
 
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')

@@ -7,7 +7,7 @@ clear;
 run("environment_definitions.m");
 
 %% load lut data
-lut_data = load_lut("aerodynamic_coefficients_panel_method_clean.csv");
+lut_data = load("aerodynamic_coefficients_panel_method_poly.mat");
 
 bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
 showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
@@ -82,6 +82,21 @@ legend("Sentman","IRS","Location","southeast");
 matlab2tikz('ol_parameters_shuttlecock.tex');
 %%
 plot_solution_at_angle(deg2rad(45));
+
+%% compare omega_0 and omega_d by plotting relative difference over control surface angle
+omega_d = ol_parameters(:,:,1).* sqrt(1 - ol_parameters(:,:,2).^2);
+omega_0 = ol_parameters(:,:,1);
+relative_difference = (omega_0 - omega_d) ./ omega_0;
+figure;
+plot(control_surface_angles__rad * 180 / pi, relative_difference(:,1), 'b-');
+hold on;
+plot(control_surface_angles__rad * 180 / pi, relative_difference(:,2), 'r-');
+grid on;
+xlabel(x_label);
+ylabel('Relative Difference [-]');
+title('Relative Difference between \omega_0 and \omega_d für verschiedene Modelle');
+legend("Sentman","IRS","Location","southeast");
+
 %%
 function [omega_0,zeta] = get_omega_zeta(I_yy,C_M_a,C_M_da)
     % INPUT PARAMETERS

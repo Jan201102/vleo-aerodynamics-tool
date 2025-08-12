@@ -10,7 +10,7 @@ run("environment_definitions.m");
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
 temperature_ratio_method = 1;
 %% load lut data
-lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+lut_data = load("aerodynamic_coefficients_panel_method_poly.mat");
 
 
 %% load geometry based on parameter
@@ -51,7 +51,7 @@ axis_direction = [0; 1; 0];               % Rotation axis (y-axis for pitch)
 torque_component = 2;                      % Component index (2 = y-component for pitch)
 
 %% calculate aerodynamic stiffness
-num_angles = 101;
+num_angles = 100;
 control_surface_angles__rad = linspace(0, pi/2, num_angles);
 aero_dampening = zeros(num_angles,2);
 for model = 1:2
@@ -70,7 +70,7 @@ for model = 1:2
         fprintf('calcluated point %d of %d\n',i+(model-1)*num_angles,2*num_angles);
     end
 end
-
+save("aerodynamic_dampening_shuttlecock.mat","aero_dampening","control_surface_angles__rad");
 %% plot stiffness of control surface angle for both models in two subplots with a tiled layout
 figure;
 plot(rad2deg(control_surface_angles__rad), aero_dampening(:,1), 'b');

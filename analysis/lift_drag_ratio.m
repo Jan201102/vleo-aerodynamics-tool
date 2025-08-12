@@ -6,17 +6,19 @@ addpath("analysis/functions");
 clear;
 % Import constants from environment:definitions.m
 run('environment_definitions.m');
-
+energy_accommodation = 1;
 %% Geometry selection parameter
 % Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
 geometry_type = 'plate'; % Options: 'plate' or 'shuttlecock'
 temperature_ratio_method = 1;
 
 %% load lut data
-lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+%lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
+%lut_data = load("aerodynamic_coefficients_panel_method_sentman_spline.mat")
+lut_data = load("aerodynamic_coefficients_panel_method_sentman_poly.mat");
 %% load geometry based on parameter
 if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(1, 1, [0,0,0],true,energy_accommodation,surface_temperature__K);
+    bodies = parametrized_flat_plate(1, 1, [0,0,0],false,energy_accommodation,surface_temperature__K);
     showBodies(bodies, [0], 0.75, 0.25);
     num_bodies = 1;
     rotation_face_index = 1;
