@@ -2,13 +2,13 @@ clear
 clc
 
 load("aerodynamic_stiffness_shuttlecock.mat")
-load("aerodynamic_dampening_shuttlecock.mat")
+load("aerodynamic_damping_shuttlecock.mat")
 
 control_surface_angle = deg2rad(45);
 c_m_sentman = interp1(control_surface_angles__rad,aero_stiffness(:,1),control_surface_angle)
 c_m_irs = interp1(control_surface_angles__rad,aero_stiffness(:,2),control_surface_angle)
-c_q_irs = interp1(control_surface_angles__rad,aero_dampening(:,2),control_surface_angle)
-c_q_sentman = interp1(control_surface_angles__rad,aero_dampening(:,1),control_surface_angle)
+c_q_irs = interp1(control_surface_angles__rad,aero_damping(:,2),control_surface_angle)
+c_q_sentman = interp1(control_surface_angles__rad,aero_damping(:,1),control_surface_angle)
 I_yy = 0.0375;
 
 %% controler

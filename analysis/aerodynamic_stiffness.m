@@ -1,17 +1,12 @@
 %% AERODYNAMIC STIFFNESS
 % calculate the aerodynamic stiffness for a satellite for different control surface configurations
 import vleo_aerodynamics_core.*
-addpath("analysis/functions");
 clear;
-%load environment data
-run("environment_definitions.m");
-%% Geometry selection parameter
+
+%% Setup environment, geometry, and LUT
 geometry_type = 'shuttlecock'; % Options: 'plate' or 'shuttlecock'
-temperature_ratio_method = 1;
-%% load lut data
-lut_data = load("aerodynamic_coefficients_panel_method_poly.mat");
-%% load geometry based on parameter
-[bodies, num_bodies, rotation_face_index, x_label] = load_geometry(geometry_type, energy_accommodation, surface_temperature__K);
+lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
+[bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type);
 
 %% Derivation Configuration
 derivation_method = 'central';  % Options: 'central', 'five_point_stencil', 'seven_point_stencil', 'forward', 'backward'
@@ -36,7 +31,8 @@ for model = 1:2
                                                                 bodies, ...
                                                                 bodies_rotation_angles__rad, ...
                                                                 model, ...
-                                                                lut_data);
+                                                                lut_data, ...
+                                                                environment_definitions);
         fprintf('calcluated point %d of %d\n',i+(model-1)*num_angles,2*num_angles);
     end
 end
@@ -49,12 +45,12 @@ plot(rad2deg(control_surface_angles__rad), aero_stiffness(:,2), 'r');
 grid on;
 xlabel(x_label);
 ylabel('Aerodynamic Stiffness [Nm/rad]');
-legend(sprintf('Sentman \\alpha_E = %.4f',energy_accommodation), 'IRS model',"Location","best");
+legend(sprintf('Sentman \\alpha_E = %.4f',environment_definitions.energy_accommodation), 'IRS model',"Location","best");
 
 hold off;
 
 %% Save figure as PNG and EPS
-matlab2tikz(sprintf('aerodynamic_stiffness_%s.tex', geometry_type));
+matlab2tikz(sprintf('aerodynamic_stiffness_%s.tex', environment_definitions.geometry_type));
 %%
 figure
 plot(rad2deg(control_surface_angles__rad),aero_stiffness(:,1)-aero_stiffness(:,2))

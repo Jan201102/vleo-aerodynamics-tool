@@ -4,7 +4,8 @@ function [bodies, num_bodies, rotation_face_index, x_label] = load_geometry(geom
 %   loads the geometry specified by geometry_type and returns the bodies,
 %   number of bodies, rotation face index, and x-axis label.
 %   If show_geometry is true, it will display the geometry.
-
+    import vleo_aerodynamics_core.*
+    
     if nargin < 4
         show_geometry = true;
     end
@@ -51,7 +52,15 @@ function [bodies, num_bodies, rotation_face_index, x_label] = load_geometry(geom
         num_bodies = 1;
         x_label = "angle of attack [°]";
         rotation_face_index = 1;
+    elseif strcmp(geometry_type,'unit_cube')
+        bodies = load_unit_cube(energy_accommodation,surface_temperature__K);
+        if show_geometry
+            showBodies(bodies,[0,0,0,0,0,0]);
+        end
+        num_bodies = 6;
+        x_label = "angle of attack [°]";
+        rotation_face_index = 1;
     else
-        error("Invalid geometry_type. Use 'plate', 'shuttlecock', 'shuttlecock_wing', 'shuttlecock_wing_new' or 'box'.");
+        error("Invalid geometry_type. Use 'plate', 'shuttlecock', 'shuttlecock_wing', 'shuttlecock_wing_new', 'box', or 'unit_cube'.");
     end
 end
