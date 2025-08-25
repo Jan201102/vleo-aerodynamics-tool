@@ -1,29 +1,37 @@
-function coeffs = piecewise_poly_fit_with_constraints(x, y, knots, degrees,constraints, continuity_degree)
-    % Fit a piecewise polynomial with constraints
-    % Inputs:
-    %   x: vector of x data points
-    %   y: vector of y data points
-    %   knots 1xN: vector of knot points defining the piecewise segments
-    %   degrees 1x(N+1): vector of polynomial degrees for each segment
-    %   constraints: Mx2 matrix where each row is [constraint_x, constraint_y]
-    %   continuity_degree: degree of continuity (0: C0 continuity, 1: C1 continuity, 2: C2 continuity)
-    % Outputs:
-    %   coeffs: coefficients of the piecewise polynomial
+function coeffs = piecewise_poly_fit_with_constraints(x, y, knots, degrees, constraints, continuity_degree)
+%PIECEWISE_POLY_FIT_WITH_CONSTRAINTS Fit piecewise polynomial with constraints
+%
+%   coeffs = PIECEWISE_POLY_FIT_WITH_CONSTRAINTS(x, y, knots, degrees, constraints, continuity_degree)
+%
+%   Fits a piecewise polynomial to data points with specified constraints
+%   and continuity requirements at knot points.
+%
+% Inputs:
+%   x                 - Vector of x data points
+%   y                 - Vector of y data points  
+%   knots             - 1xN vector of knot points defining piecewise segments
+%   degrees           - 1x(N+1) vector of polynomial degrees for each segment
+%   constraints       - Mx2 matrix where each row is [constraint_x, constraint_y]
+%   continuity_degree - Integer, degree of continuity (0: C0, 1: C1, 2: C2)
+%
+% Outputs:
+%   coeffs - Coefficients of the piecewise polynomial
 
     % Ensure knots are sorted
     knots = sort(knots);
     n_segments = length(knots) + 1;
+    
     if length(degrees) ~= n_segments
         error('Degrees must match the number of segments defined by knots.');
     end
     
-    % Initialize the coefficient matrix and right-hand side vector
+    %% Initialize Coefficient Matrix
     n_constraints = size(constraints, 1);
-    coeff_counts = degrees+1;
+    coeff_counts = degrees + 1;
     n_coeffs = sum(coeff_counts);
     A = zeros(length(y), n_coeffs);
     
-    % Create the Vandermonde matrix for each segment
+    %% Create Vandermonde Matrix for Each Segment
     for i = 1:n_segments
         if i == 1
             segment_idx = x <= knots(i);

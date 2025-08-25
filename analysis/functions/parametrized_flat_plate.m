@@ -1,32 +1,36 @@
-function bodies = parametrized_flat_plate(x_dim, y_dim, cog, two_sided,energy_accommodation_coefficient,surface_temp__K)
-    % CREATE_FLAT_PLATE Creates a flat plate body structure
-    %
-    % Inputs:
-    %   x_dim - dimension in x direction (width)
-    %   y_dim - dimension in y direction (height)
-    %   cog - 3x1 coordinates of center of gravity in CAD system
-    %   two_sided - logical, true for two-sided plate, false for one-sided (optional, default: true)
-    %
-    % Output:
-    %   bodies - 1x1 cell containing body structure in body frame (centered at COG)
+function bodies = parametrized_flat_plate(x_dim, y_dim, cog, two_sided, energy_accommodation_coefficient, surface_temp__K)
+%PARAMETRIZED_FLAT_PLATE Create a parametrized flat plate body structure
+%
+%   bodies = PARAMETRIZED_FLAT_PLATE(x_dim, y_dim, cog, two_sided, energy_accommodation_coefficient, surface_temp__K)
+%
+%   Creates a flat plate body structure with specified dimensions and properties.
+%   The plate can be configured as one-sided or two-sided for aerodynamic analysis.
+%
+% Inputs:
+%   x_dim                           - Double, plate width [m]
+%   y_dim                           - Double, plate height [m] 
+%   cog                             - 3x1 double, center of gravity coordinates [m]
+%   two_sided                       - Logical, true for two-sided plate (default: true)
+%   energy_accommodation_coefficient - Double, energy accommodation coefficient (default: 0.9)
+%   surface_temp__K                 - Double, surface temperature [K] (default: 300)
+%
+% Outputs:
+%   bodies - 1x1 cell array containing body structure in body frame (centered at COG)
+
     arguments
-        x_dim (1,1) double {mustBePositive} = 1.0; % Width of the plate
-        y_dim (1,1) double {mustBePositive} = 1.0; % Height of the plate
-        cog (3,1) double = [0;0;0]; % Center of gravity coordinate in CAD system
-        two_sided (1,1) logical = true; % Two-sided plate flag
-        energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
-        surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
-    end
-    % Default to two-sided if not specified
-    if nargin < 5
-        two_sided = true;
+        x_dim (1,1) double {mustBePositive} = 1.0
+        y_dim (1,1) double {mustBePositive} = 1.0
+        cog (3,1) double = [0; 0; 0]
+        two_sided (1,1) logical = true
+        energy_accommodation_coefficient (1,1) double = 0.9
+        surface_temp__K (1,1) double = 300
     end
     
     % Half dimensions for easier vertex calculation
     half_x = x_dim / 2;
     half_y = y_dim / 2;
     
-    % Create body structure
+    %% Create Body Structure
     body = struct();
     
     % Determine number of triangles based on plate type

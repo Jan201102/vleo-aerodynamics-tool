@@ -1,33 +1,45 @@
-%% LOAD BOX TRUNCATED
-%% This functions loads the box shaped satellite
-%  from six separate .obj files for each side
-function bodies = load_unit_cube(energy_accommodation_coefficient,surface_temp__K)
+function bodies = load_unit_cube(energy_accommodation_coefficient, surface_temp__K)
+%LOAD_UNIT_CUBE Load unit cube geometry for aerodynamic analysis
+%
+%   bodies = LOAD_UNIT_CUBE(energy_accommodation_coefficient, surface_temp__K)
+%
+%   Loads a unit cube geometry consisting of six separate faces from 
+%   individual .obj files.
+%
+% Inputs:
+%   energy_accommodation_coefficient - Double, energy accommodation coefficient (default: 0.9)
+%   surface_temp__K                 - Double, surface temperature [K] (default: 300)
+%
+% Outputs:
+%   bodies - Cell array containing body structures for each cube face
+
     arguments
-        energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
-        surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
+        energy_accommodation_coefficient (1,1) double = 0.9
+        surface_temp__K (1,1) double = 300
     end
 
     import vleo_aerodynamics_core.*
-    % Get absolute path of test folder
-    [test_folder,~,~] = fileparts(mfilename("fullpath"));
-
-    disp(test_folder)
+    
+    %% Get File Paths
+    [test_folder, ~, ~] = fileparts(mfilename("fullpath"));
+    fprintf('Loading unit cube from: %s\n', test_folder);
+    
     obj_files = string(fullfile(test_folder, '../obj/cube', ...
-                                 {'front.obj', ...
+                                {'front.obj', ...
                                  'left.obj', ...
-                                 'back.obj',...
-                                 'right.obj',...
-                                 'top.obj',...
-                                 'bottom.obj'
-                                 }));
+                                 'back.obj', ...
+                                 'right.obj', ...
+                                 'top.obj', ...
+                                 'bottom.obj'}));
 
-    % Define rotation hinge points for each side (no rotation for box sides)
-    rotation_hinge_points_CAD = zeros(3,6);
+    %% Define Geometric Properties
+    % Rotation hinge points for each face (no rotation for cube faces)
+    rotation_hinge_points_CAD = zeros(3, 6);
 
-    % Define rotation directions for each side (no rotation for box sides)
-    rotation_directions_CAD = ones(3,6);
+    % Rotation directions for each face (no rotation for cube faces)
+    rotation_directions_CAD = ones(3, 6);
 
-    % Surface temperatures for all six sides
+    % Surface temperatures for all six faces
     surface_temperatures__K = num2cell(surface_temp__K*ones(1,6));
 
     % Surface energy accommodation coefficients for all six sides

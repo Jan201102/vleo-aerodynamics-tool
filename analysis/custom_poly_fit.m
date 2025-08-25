@@ -1,5 +1,9 @@
-%% custom poly fit
+%% CUSTOM POLYNOMIAL FIT ANALYSIS
+% Process aerodynamic coefficient data and create polynomial fits
+% for lift and drag coefficients with proper constraints
 clear; clc; close all;
+
+%% Load and Process Data
 csv_file_in = 'aerodynamic_coefficients_panel_method.csv';
 data = readtable(csv_file_in);
 
@@ -7,49 +11,54 @@ data = readtable(csv_file_in);
 AoA = data.AoA;
 C_l_ram = data.C_l_ram;
 
-%ensure 90 lift value is 0
+% Ensure 90° lift value is 0 (physical constraint)
 C_l_ram(end) = 0;
 C_d_ram = data.C_d_ram;
 C_l_wake = data.C_l_wake;
 C_d_wake = data.C_d_wake;
 
-% reorder and concatenate data
-AoA_total = [flip(-AoA(2:end));AoA];
-C_l_total = [flip(-C_l_wake(2:end));C_l_ram];
-C_d_total = [flip(C_d_wake(2:end));C_d_ram];
-data = [AoA_total C_l_total C_d_total];
+%% Combine Ram and Wake Data
+% Reorder and concatenate data to cover full angle range
+AoA_total = [flip(-AoA(2:end)); AoA];
+C_l_total = [flip(-C_l_wake(2:end)); C_l_ram];
+C_d_total = [flip(C_d_wake(2:end)); C_d_ram];
+data = [AoA_total, C_l_total, C_d_total];
 
-%% plot raw data
+%% Plot Raw Data
 figure;
 hold on;
-scatter(AoA_total, C_l_total,".", 'DisplayName', 'C_l Data');
-scatter(AoA_total, C_d_total,".", 'DisplayName', 'C_d Data');
-xlabel('Angle of Attack (degrees)');
-ylabel('Aerodynamic Coefficients');
+scatter(AoA_total, C_l_total, ".", 'DisplayName', 'C_l Data', 'SizeData', 50);
+scatter(AoA_total, C_d_total, ".", 'DisplayName', 'C_d Data', 'SizeData', 50);
+xlabel('Angle of Attack [°]');
+ylabel('Aerodynamic Coefficients [-]');
+title('Raw Aerodynamic Coefficient Data');
 legend('Location', 'best');
 grid on;
 
-%% Evaluate different polynomial degrees
-% Boundaries define the ranges: [ boundary_1_2, boundary_2_3]
-boundaries = [-24, 0];
+%% Polynomial Degree Analysis
+% Define boundaries for piecewise polynomial segments
+boundaries = [-24, 0];  % [boundary_1_2, boundary_2_3]
 
-% Analyze polynomial degrees from 2 to 20 for segments 2 and 3
+% Analyze polynomial degrees from 4 to 20 for segments 2 and 3
 degree_range = 4:20;
 mse_cl_values = zeros(size(degree_range));
 mse_cd_values = zeros(size(degree_range));
 
 % Get segment 2 and 3 indices for evaluation
-segment_2_3_idx = AoA_total > boundaries(1) & AoA_total <= boundaries(2) | AoA_total > boundaries(2);
+segment_2_3_idx = (AoA_total > boundaries(1) & AoA_total <= boundaries(2)) | ...
+                  (AoA_total > boundaries(2));
 n_points_eval = sum(segment_2_3_idx);  % Number of points for BIC calculation
+
+fprintf('Evaluating polynomial degrees from %d to %d...\n', min(degree_range), max(degree_range));
 
 for i = 1:length(degree_range)
     degree = degree_range(i);
     
-    % Polynomial degrees for each range: [constant, degree, degree]
+    % Polynomial degrees for each segment: [constant, degree, degree]
     poly_degrees = [0, degree, degree];
     
-    % Constraint points for C_l
-    constraint_points_Cl = [90,0];
+    % Constraint points for C_l (lift coefficient must be 0 at 90°)
+    constraint_points_Cl = [90, 0];
     
     % Fit polynomials
     global_piecewise_coeff_cl = piecewise_poly_fit_with_constraints(AoA_total, C_l_total, boundaries, poly_degrees, constraint_points_Cl, 1);

@@ -1,27 +1,34 @@
 
 function pp = coeffs_to_mkpp(coeffs, knots, degrees)
-    % Convert global coordinate piecewise polynomial coefficients to mkpp object
-    % Inputs:
-    %   coeffs: coefficient vector from piecewise_poly_fit_with_constraints
-    %   knots: vector of knot points (same as used in fitting)
-    %   degrees: vector of polynomial degrees for each segment
-    % Output:
-    %   pp: MATLAB piecewise polynomial structure compatible with ppval
-    
-    % Number of segments
+%COEFFS_TO_MKPP Convert piecewise polynomial coefficients to MATLAB pp structure
+%
+%   pp = COEFFS_TO_MKPP(coeffs, knots, degrees)
+%
+%   Converts global coordinate piecewise polynomial coefficients from 
+%   piecewise_poly_fit_with_constraints to a MATLAB piecewise polynomial
+%   structure compatible with ppval.
+%
+% Inputs:
+%   coeffs  - Coefficient vector from piecewise_poly_fit_with_constraints
+%   knots   - Vector of knot points (same as used in fitting)
+%   degrees - Vector of polynomial degrees for each segment
+%
+% Outputs:
+%   pp - MATLAB piecewise polynomial structure compatible with ppval
+
+    %% Initialize Parameters
     n_segments = length(knots) + 1;
     coeff_counts = degrees + 1;
     
     % Create break points (including endpoints)
-    % Assume the first segment starts at the minimum x value in your data
-    % and the last segment extends beyond the last knot
-    breaks = [-90, knots, 90];  % You may need to adjust the endpoints
+    % Note: Endpoints may need adjustment based on your data range
+    breaks = [-90, knots, 90];
     
-    % Initialize coefficient matrix for mkpp
+    % Initialize coefficient matrix for mkpp format
     max_degree = max(degrees);
     coeff_matrix = zeros(n_segments, max_degree + 1);
     
-    % Convert each segment from global to local coordinates
+    %% Convert Each Segment from Global to Local Coordinates
     for i = 1:n_segments
         % Extract coefficients for this segment (in ascending power order)
         start_idx = sum(coeff_counts(1:i-1)) + 1;
