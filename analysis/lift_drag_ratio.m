@@ -4,51 +4,22 @@
 import vleo_aerodynamics_core.*
 addpath("analysis/functions");
 clear;
-% Import constants from environment:definitions.m
 run('environment_definitions.m');
-energy_accommodation = 1;
+
 %% Geometry selection parameter
-% Set to 'plate' for flat plate geometry or 'shuttlecock' for shuttlecock model
 geometry_type = 'plate'; % Options: 'plate' or 'shuttlecock'
 temperature_ratio_method = 1;
 
 %% load lut data
-%lut_data = load_lut("aerodynamic_coefficients_panel_method.csv");
-%lut_data = load("aerodynamic_coefficients_panel_method_sentman_spline.mat")
-lut_data = load("aerodynamic_coefficients_panel_method_sentman_poly.mat");
+lut_data = load("aerodynamic_coefficients_panel_method_poly.mat");
+
 %% load geometry based on parameter
-if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(1, 1, [0,0,0],false,energy_accommodation,surface_temperature__K);
-    showBodies(bodies, [0], 0.75, 0.25);
-    num_bodies = 1;
-    rotation_face_index = 1;
-    x_label = "angle of attack [°]";
-elseif strcmp(geometry_type, 'shuttlecock')
-    bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
-    showBodies(bodies, [0,0/4,0/4,pi/4,0/4], 0.75, 0.25);
-    num_bodies = 5;
+[bodies, num_bodies, rotation_face_index, x_label] = load_geometry(geometry_type, energy_accommodation, surface_temperature__K);
+if strcmp(geometry_type, 'shuttlecock')
     rotation_face_index = 3;
-    x_label = "control surface angle [°]";
-elseif strcmp(geometry_type, 'shuttlecock_wing')
-    bodies = load_shuttlecock_wing(energy_accommodation,surface_temperature__K);
-    showBodies(bodies, [0/4], 0.75, 0.25);
-    num_bodies = 1;
-    rotation_face_index = 1;
-    x_label = "angle of attack [°]";
-elseif strcmp(geometry_type, 'shuttlecock_wing_new')
-    bodies_all = load_from_gmsh(energy_accommodation,surface_temperature__K);
-    bodies = cell(1,1);
-    bodies{1} = bodies_all{3};
-    showBodies(bodies, [pi/4], 0.75, 0.25);
-    num_bodies = 1;
-    rotation_face_index = 1;
-    x_label = "angle of attack [°]";
-else
-    error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
 end
 
 %% calculate aerodynamic forces
-
 %loops
 attitude_quarternion_BI = [1;0;0;0];
 num_angles = 101;
@@ -78,6 +49,7 @@ end
 
 aerodynamic_force_sentman__N = aerodynamic_force_B__N(:,:,1);
 aerodynamic_force_new__N = aerodynamic_force_B__N(:,:,2);
+
 % calculate lift to drag ratio
 lift_sentman__N = aerodynamic_force_sentman__N(3,:);
 drag_sentman__N = -aerodynamic_force_sentman__N(1,:);
@@ -99,15 +71,23 @@ legend;
 %% Save figure as PNG and EPS
 matlab2tikz(sprintf('lift_drag_ratio_%s.tex', geometry_type));
 
-%% plot force envelopes for both models
+%% plot  drag an lift coefficients for both models in a 2x1 subplot grid
+factor = 0.5*density__kg_per_m3*norm(velocity_I_I__m_per_s)^2;
 figure;
+subplot(2,1,1);
 hold on;
 grid on;
-plot3(aerodynamic_force_B__N(1,:,1), aerodynamic_force_B__N(2,:,1), aerodynamic_force_B__N(3,:,1), 'b', 'DisplayName', sprintf('Sentman Model \\alpha_E = %.4f',energy_accommodation));
-plot3(aerodynamic_force_B__N(1,:,2), aerodynamic_force_B__N(2,:,2), aerodynamic_force_B__N(3,:,2), 'r', 'DisplayName', 'New IRS Model');
-xlabel('X Force [N]');
-ylabel('Y Force [N]');
-zlabel('Z Force [N]');
-title(sprintf('Aerodynamic Force Envelopes for %s geometry', geometry_type));
-view([0 -1 0])
+plot(rad2deg(control_surface_angles__rad), lift_sentman__N/factor, "b", 'DisplayName','Sentman Model');
+plot(rad2deg(control_surface_angles__rad), lift_new__N/factor, "r", 'DisplayName', 'Schütte Model');
+xlabel(x_label);
+ylabel('C_L');
 legend;
+subplot(2,1,2);
+hold on;
+grid on;
+plot(rad2deg(control_surface_angles__rad), drag_sentman__N/factor, "b", 'DisplayName',"Sentman Model");
+plot(rad2deg(control_surface_angles__rad), drag_new__N/factor, "r", 'DisplayName', 'Schütte Model');
+xlabel(x_label);
+ylabel('C_D');
+legend("location","northwest");
+matlab2tikz('drag_lift_coeffcients.tikz')

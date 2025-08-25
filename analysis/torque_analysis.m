@@ -23,15 +23,15 @@ num_bodies = length(bodies);
 %load lut data
 lut_data = load("aerodynamic_coefficients_panel_method_poly.mat");
 %%
-
+bodies = load_unit_cube(energy_accommodation,surface_temperature__K);
 showBodies(bodies,[0,0,0,0,0,0])
 
 %% Calculate torque curves
 
 % Set control surface angles to 0 for shuttlecock geometry
-bodies_rotation_angles = pi/2 * zeros(num_bodies);
-num_pitch_angles = 101;
-pitch_angles__rad = linspace(-pi/4, pi/4, num_pitch_angles);
+bodies_rotation_angles = zeros(num_bodies);
+num_pitch_angles = 201;
+pitch_angles__rad = linspace(0,2*pi, num_pitch_angles);
 %pitch_angles__rad = [pi/8];
 torques = zeros(num_pitch_angles, 2,3,num_bodies); % 2 models
 total_torques = zeros(num_pitch_angles, 2,3); % 2 models
@@ -78,25 +78,17 @@ end
 %% Plot results
 c_total_torques = squeeze(sum(torques, 4)); % Sum over all bodies
 figure;
-subplot(2,1,1);
-plot(rad2deg(pitch_angles__rad), total_torques(:,1,2), 'b-', 'LineWidth', 2);
+plot(rad2deg(pitch_angles__rad), total_torques(:,1,2), 'b-');
 hold on;
-plot(rad2deg(pitch_angles__rad), c_total_torques(:,1,2), 'b--', 'LineWidth', 2);
-grid on;
+plot(rad2deg(pitch_angles__rad), total_torques(:,2,2), 'r-');
+grid on
+xlim([0 360])
 xlabel('Pitch Angle [°]');
 ylabel('Pitch Torque [Nm]');
-
-subplot(2,1,2)
-plot(rad2deg(pitch_angles__rad), total_torques(:,2,2), 'r-', 'LineWidth', 2);
-hold on;
-plot(rad2deg(pitch_angles__rad), c_total_torques(:,2,2), 'r--', 'LineWidth', 2);
-grid on;
-xlabel('Pitch Angle [°]');
-ylabel('Pitch Torque [Nm]');
-
+legend("Sentman","IRS")
 title('Pitch Torque vs Pitch Angle ');
 hold off;
-
+%matlab2tikz('torque_curves_unit_cube.tex')
 %% plot pitch torques for each model of all bodies in a 2x1 grid
 figure;
 subplot(2,1,1);

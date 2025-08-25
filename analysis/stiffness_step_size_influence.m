@@ -13,35 +13,7 @@ temperature_ratio_method = 1;
 lut_data = load_lut("aerodynamic_coefficients_fitted_highres.csv");
 
 %% load geometry based on parameter
-if strcmp(geometry_type, 'plate')
-    bodies = parametrized_flat_plate(1, 1, 0.5, 0.0,true,energy_accommodation,surface_temperature__K);
-    showBodies(bodies, [0], 0.75, 0.25);
-    num_bodies = 1;
-    rotation_face_index = 1;
-    x_label = "angle of attack [deg]";
-elseif strcmp(geometry_type, 'shuttlecock')
-    bodies = load_from_gmsh(energy_accommodation,surface_temperature__K);
-    showBodies(bodies, [0,pi/4,pi/4,pi/4,pi/4], 0.75, 0.25);
-    num_bodies = 5;
-    rotation_face_index = [2,3,4,5];
-    x_label = "control surface angle [deg]";
-elseif strcmp(geometry_type, 'shuttlecock_wing')
-    bodies = load_shuttlecock_wing(energy_accommodation,surface_temperature__K);
-    showBodies(bodies, [0/4], 0.75, 0.25);
-    num_bodies = 1;
-    rotation_face_index = 1;
-    x_label = "angle of attack [deg]";
-elseif strcmp(geometry_type, 'shuttlecock_wing_new')
-    bodies_all = load_from_gmsh(energy_accommodation,surface_temperature__K);
-    bodies = cell(1,1);
-    bodies{1} = bodies_all{3};
-    showBodies(bodies, [pi/4], 0.75, 0.25);
-    num_bodies = 1;
-    rotation_face_index = 1;
-    x_label = "angle of attack [deg]";
-else
-    error("Invalid geometry_type. Use 'plate' or 'shuttlecock'.");
-end
+[bodies, num_bodies, rotation_face_index, x_label] = load_geometry(geometry_type, energy_accommodation, surface_temperature__K);
 
 %% Define delta_alpha values to analyze
 delta_alphas = [1e-4,1e-3,1e-2,1e-1,1,1e1,1e2,1e3,1e4]; % radians (reduced range for angle sweep)
