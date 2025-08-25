@@ -75,6 +75,14 @@ The `vleoAerodynamics`-function calculates the aerodynamic forces and torques ac
      - 3: Hyperthermal approximation 2
      
      For further explanation, see: https://arxiv.org/abs/2411.11597
+- `model`: scalar value of the model used to calculate aerodynamic forces and torques
+     - 1: classical approach (Sentmann)
+     - 2: new IRS model
+     - 3: dummy model
+- `summation_method`: Scalar value of the method to sum the aerodynamic forces and torques
+     - 1: sum over all faces of all bodies
+     - 2: sum over all faces of each body separately, this will change the output from 3x1 to 3x`num_bodies`x1
+- `LUT_path`: Path to the lookup table for the new IRS model
 
 #### Outputs
 - `aerodynamic_force_B__N`: 3x1 array of the aerodynamic force acting on the satellite expressed in the body frame

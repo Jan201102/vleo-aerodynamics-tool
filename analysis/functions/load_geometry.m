@@ -1,0 +1,92 @@
+function [bodies, num_bodies, rotation_face_index, x_label] = ...
+         load_geometry(geometry_type, energy_accommodation, surface_temperature__K, show_geometry)
+%LOAD_GEOMETRY Load a geometry based on the specified type
+%
+%   [bodies, num_bodies, rotation_face_index, x_label] = 
+%       LOAD_GEOMETRY(geometry_type, energy_accommodation, surface_temperature__K, show_geometry)
+%
+%   Loads the geometry specified by geometry_type and returns the bodies,
+%   number of bodies, rotation face index, and x-axis label.
+%
+% Inputs:
+%   geometry_type         - String, type of geometry to load
+%                          Options: 'plate', 'shuttlecock', 'shuttlecock_wing', 
+%                          'shuttlecock_wing_new', 'box', 'unit_cube'
+%   energy_accommodation  - Double, energy accommodation coefficient
+%   surface_temperature__K - Double, surface temperature [K]
+%   show_geometry        - Logical, optional flag to display geometry (default: true)
+%
+% Outputs:
+%   bodies               - Cell array of body structures
+%   num_bodies          - Integer, number of bodies in geometry
+%   rotation_face_index - Array, indices of rotatable faces
+%   x_label             - String, label for x-axis in plots
+
+    import vleo_aerodynamics_core.*
+    
+    if nargin < 4
+        show_geometry = true;
+    end
+
+    %% Load Geometry Based on Type
+    if strcmp(geometry_type, 'plate')
+        bodies = parametrized_flat_plate(1, 1, [0,0,0], true, energy_accommodation, surface_temperature__K);
+        if show_geometry
+            showBodies(bodies, [0], 0.75, 0.25);
+        end
+        num_bodies = 1;
+        rotation_face_index = 1;
+        x_label = "Angle of Attack [°]";
+        
+    elseif strcmp(geometry_type, 'shuttlecock')
+        bodies = load_from_gmsh(energy_accommodation, surface_temperature__K);
+        if show_geometry
+            showBodies(bodies, [0, pi/4, pi/4, pi/4, pi/4], 0.75, 0.25);
+        end
+        num_bodies = 5;
+        rotation_face_index = [2, 3, 4, 5];
+        x_label = "Control Surface Angle [°]";
+        
+    elseif strcmp(geometry_type, 'shuttlecock_wing')
+        bodies = load_shuttlecock_wing(energy_accommodation, surface_temperature__K);
+        if show_geometry
+            showBodies(bodies, [0], 0.75, 0.25);
+        end
+        num_bodies = 1;
+        rotation_face_index = 1;
+        x_label = "Angle of Attack [°]";
+        
+    elseif strcmp(geometry_type, 'shuttlecock_wing_new')
+        bodies_all = load_from_gmsh(energy_accommodation, surface_temperature__K);
+        bodies = cell(1, 1);
+        bodies{1} = bodies_all{3};
+        if show_geometry
+            showBodies(bodies, [pi/4], 0.75, 0.25);
+        end
+        num_bodies = 1;
+        rotation_face_index = 1;
+        x_label = "Angle of Attack [°]";
+        
+    elseif strcmp(geometry_type, 'box')
+        bodies = load_box(energy_accommodation, surface_temperature__K);
+        if show_geometry
+            showBodies(bodies, [0]);
+        end
+        num_bodies = 1;
+        rotation_face_index = 1;
+        x_label = "Angle of Attack [°]";
+        
+    elseif strcmp(geometry_type, 'unit_cube')
+        bodies = load_unit_cube(energy_accommodation, surface_temperature__K);
+        if show_geometry
+            showBodies(bodies, [0, 0, 0, 0, 0, 0]);
+        end
+        num_bodies = 6;
+        rotation_face_index = 1;
+        x_label = "Angle of Attack [°]";
+        
+    else
+        error("Invalid geometry_type. Options: 'plate', 'shuttlecock', 'shuttlecock_wing', " + ...
+              "'shuttlecock_wing_new', 'box', or 'unit_cube'.");
+    end
+end
