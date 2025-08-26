@@ -1,7 +1,7 @@
-function coeffs = piecewise_poly_fit_with_constraints(x, y, knots, degrees, constraints, continuity_degree)
-%PIECEWISE_POLY_FIT_WITH_CONSTRAINTS Fit piecewise polynomial with constraints
+function coeffs = piecewisePolyFitWithConstraints(x, y, knots, degrees, constraints, continuity_degree)
+%piecewisePolyFitWithConstraints Fit piecewise polynomial with constraints
 %
-%   coeffs = PIECEWISE_POLY_FIT_WITH_CONSTRAINTS(x, y, knots, degrees, constraints, continuity_degree)
+%   coeffs = piecewisePolyFitWithConstraints(x, y, knots, degrees, constraints, continuity_degree)
 %
 %   Fits a piecewise polynomial to data points with specified constraints
 %   and continuity requirements at knot points.

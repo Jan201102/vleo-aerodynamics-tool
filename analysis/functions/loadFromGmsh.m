@@ -1,7 +1,7 @@
-function bodies = load_from_gmsh(energy_accommodation_coefficient, surface_temp__K)
-%LOAD_FROM_GMSH Load shuttlecock geometry from GMSH-generated files
+function bodies = loadFromGmsh(energy_accommodation_coefficient, surface_temp__K)
+%loadFromGmsh Load shuttlecock geometry from GMSH-generated files
 %
-%   bodies = LOAD_FROM_GMSH(energy_accommodation_coefficient, surface_temp__K)
+%   bodies = loadFromGmsh(energy_accommodation_coefficient, surface_temp__K)
 %
 %   Loads the shuttlecock satellite configuration with main body and
 %   four movable control surfaces from GMSH-generated .obj files.

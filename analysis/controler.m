@@ -174,13 +174,17 @@ legend(sprintf('Sentman \\rho = %.2e', density_min), ...
        sprintf('IRS \\rho = %.2e', density_min), ...
        sprintf('IRS \\rho = %.2e', density_max));
 title('Open-Loop Frequency Response - Density Study');
-matlab2tikz('G0_bode_density_study.tex', 'showInfo', false);
+matlab2tikz('G0_bode_density_study.tikz', 'showInfo', false);
 
-% Display stability margins for all cases
-[~, ~] = margin(G_0_sentman_max);
-[~, ~] = margin(G_0_sentman_min);
-[~, ~] = margin(G_0_irs_max);
-[~, ~] = margin(G_0_irs_min);
+%% Display stability margins for all cases
+[g, p] = margin(G_0_sentman_max);
+sprintf('sentman max gain margin %0.5e phase margin %0.5e',g,p)
+[g, p] = margin(G_0_sentman_min);
+sprintf('sentman min gain margin %0.5e phase margin %0.5e',g,p)
+[g, p] = margin(G_0_irs_max);
+sprintf('irs max gain margin %0.5e phase margin %0.5e',g,p)
+[g, p] = margin(G_0_irs_min);
+sprintf('irs min gain margin %0.5e phase margin %0.5e',g,p)
 
 %% Initial Condition Response - Density Study
 figure;

@@ -1,7 +1,7 @@
-function derivative = numerical_differentiation(method, delta, func_handle, x0, component)
-%% numerical_differentiation - Generic numerical differentiation function
+function derivative = numericalDifferentiation(method, delta, func_handle, x0, component)
+%% numericalDifferentiation - Generic numerical differentiation function
 %
-% derivative = numerical_differentiation(method, delta, func_handle, x0, component)
+% derivative = numericalDifferentiation(method, delta, func_handle, x0, component)
 %
 % This function calculates the numerical derivative of a function using
 % various finite difference methods.

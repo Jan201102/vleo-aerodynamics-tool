@@ -1,7 +1,7 @@
-function bodies = load_unit_cube(energy_accommodation_coefficient, surface_temp__K)
-%LOAD_UNIT_CUBE Load unit cube geometry for aerodynamic analysis
+function bodies = loadUnitCube(energy_accommodation_coefficient, surface_temp__K)
+%loadUnitCube Load unit cube geometry for aerodynamic analysis
 %
-%   bodies = LOAD_UNIT_CUBE(energy_accommodation_coefficient, surface_temp__K)
+%   bodies = loadUnitCube(energy_accommodation_coefficient, surface_temp__K)
 %
 %   Loads a unit cube geometry consisting of six separate faces from 
 %   individual .obj files.
@@ -45,7 +45,7 @@ function bodies = load_unit_cube(energy_accommodation_coefficient, surface_temp_
     % Surface energy accommodation coefficients for all six sides
     surface_energy_accommodation_coefficients = num2cell(energy_accommodation_coefficient*ones(1,6));
 
-    % Use the same DCM and CoM as in load_box
+    % Use the same DCM and CoM as in loadBox
     DCM_B_from_CAD = eye(3);
 
     CoM_CAD = [0; 0; 0];

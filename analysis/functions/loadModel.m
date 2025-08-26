@@ -1,7 +1,7 @@
 %% LOAD MODEL
 %% This functions loads the shuttle cock configuration sattelite
 %  from .obj files stored in the example folder
-function bodies = load_model(energy_accommodation_coefficient,surface_temp__K)
+function bodies = loadModel(energy_accommodation_coefficient,surface_temp__K)
     arguments
         energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
         surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
