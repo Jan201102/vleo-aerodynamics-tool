@@ -9,7 +9,7 @@ function bodies = load_model(energy_accommodation_coefficient,surface_temp__K)
 
     import vleo_aerodynamics_core.*
     % Get absolute path of test folder
-    %[test_folder,~,~] = fileparts(mfilename("fullpath"));
+    %[test_folder,~,~] = fileparts(mfilename('fullpath'));
     [test_folder,~,~] = fileparts(matlab.desktop.editor.getActiveFilename);
     disp(test_folder)
     object_files = string(fullfile(test_folder, 'obj', ...

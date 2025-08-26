@@ -21,7 +21,7 @@ function bodies = load_unit_cube(energy_accommodation_coefficient, surface_temp_
     import vleo_aerodynamics_core.*
     
     %% Get File Paths
-    [test_folder, ~, ~] = fileparts(mfilename("fullpath"));
+    [test_folder, ~, ~] = fileparts(mfilename('fullpath'));
     fprintf('Loading unit cube from: %s\n', test_folder);
     
     obj_files = string(fullfile(test_folder, '../obj/cube', ...

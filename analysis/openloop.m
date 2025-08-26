@@ -6,7 +6,7 @@ clear;
 
 %% Setup Environment, Geometry, and LUT
 geometry_type = 'shuttlecock';
-lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
+lut_file = 'aerodynamic_coefficients_panel_method_poly.mat';
 [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type);
 I_yy = 0.0375; % Moment of inertia around y-axis
 
@@ -68,7 +68,7 @@ for model = 1:2
 end
 
 %% Save Calculated Open-Loop Parameters
-save("ol_parameters.mat", "ol_parameters", "control_surface_angles__rad");
+save('ol_parameters.mat', 'ol_parameters', 'control_surface_angles__rad');
 
 %% Plot Natural Frequency and Damping Ratio
 figure;
@@ -76,25 +76,25 @@ t = tiledlayout(2, 1);
 
 % Natural frequency plot
 nexttile;
-plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,1,1)), "b-");
+plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,1,1)), 'b-');
 hold on;
-plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,2,1)), "r-");
+plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,2,1)), 'r-');
 grid on;
 xlabel(x_label);
 ylabel('Natural Frequency \omega_0 [rad/s]');
 title('Natural Frequency for Different Models');
-legend("Sentman", "IRS", "Location", "southeast");
+legend('Sentman', 'IRS', 'Location', 'southeast');
 
 % Damping ratio plot
 nexttile;
-plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,1,2)), "b-");
+plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,1,2)), 'b-');
 hold on;
-plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,2,2)), "r-");
+plot(rad2deg(control_surface_angles__rad), squeeze(ol_parameters(:,2,2)), 'r-');
 grid on;
 xlabel(x_label);
 ylabel('Damping Ratio \zeta [-]');
 title('Damping Ratio for Different Models');
-legend("Sentman", "IRS", "Location", "southeast");
+legend('Sentman', 'IRS', 'Location', 'southeast');
 
 % Save plot
 matlab2tikz('ol_parameters_shuttlecock.tex');
@@ -113,7 +113,7 @@ grid on;
 xlabel(x_label);
 ylabel('Relative Difference [-]');
 title('Relative Difference between \omega_0 and \omega_d');
-legend("Sentman", "IRS", "Location", "southeast");
+legend('Sentman', 'IRS', 'Location', 'southeast');
 
 
  

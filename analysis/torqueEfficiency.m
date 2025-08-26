@@ -6,7 +6,7 @@ clear;
 
 %% Setup Environment, Geometry, and LUT
 geometry_type = 'shuttlecock';  % Options: 'plate' or 'shuttlecock'
-lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
+lut_file = 'aerodynamic_coefficients_panel_method_poly.mat';
 [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type);
 % Override rotation_face_index for this specific analysis
 if strcmp(geometry_type, 'shuttlecock')

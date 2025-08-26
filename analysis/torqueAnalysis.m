@@ -5,10 +5,10 @@ import vleo_aerodynamics_core.*;
 
 %% Setup Environment, Geometry, and LUT
 geometry_type = 'unit_cube';
-lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
+lut_file = 'aerodynamic_coefficients_panel_method_poly.mat';
 [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = ...
     setup(lut_file, geometry_type);
-bodies_label = ["bottom", "left", "top", "right", "back", "front"];
+bodies_label = ['bottom', 'left', 'top', 'right', 'back', 'front'];
 
 %% Calculate Torque Curves
 % Set control surface angles to 0 for unit cube geometry

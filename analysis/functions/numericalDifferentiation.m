@@ -29,13 +29,13 @@ function derivative = numerical_differentiation(method, delta, func_handle, x0, 
     
     switch method
         case 'central'
-            % Central difference: f'(x) ≈ (f(x+h) - f(x-h)) / (2h)
+            % Central difference: f'(x) ~= (f(x+h) - f(x-h)) / (2h)
             f_plus = extract_component(func_handle(x0 + delta));
             f_minus = extract_component(func_handle(x0 - delta));
             derivative = (f_plus - f_minus) / (2 * delta);
             
         case 'five_point_stencil'
-            % Five-point stencil: f'(x) ≈ (-f(x+2h) + 8f(x+h) - 8f(x-h) + f(x-2h)) / (12h)
+            % Five-point stencil: f'(x) ~= (-f(x+2h) + 8f(x+h) - 8f(x-h) + f(x-2h)) / (12h)
             f_1 = extract_component(func_handle(x0 - 2*delta));
             f_2 = extract_component(func_handle(x0 - delta));
             f_3 = extract_component(func_handle(x0 + delta));
@@ -43,7 +43,7 @@ function derivative = numerical_differentiation(method, delta, func_handle, x0, 
             derivative = (-f_4 + 8*f_3 - 8*f_2 + f_1) / (12 * delta);
             
         case 'seven_point_stencil'
-            % Seven-point stencil: f'(x) ≈ (-f(x-3h) + 9f(x-2h) - 45f(x-h) + 45f(x+h) - 9f(x+2h) + f(x+3h)) / (60h)
+            % Seven-point stencil: f'(x) ~= (-f(x-3h) + 9f(x-2h) - 45f(x-h) + 45f(x+h) - 9f(x+2h) + f(x+3h)) / (60h)
             f_1 = extract_component(func_handle(x0 - 3*delta));
             f_2 = extract_component(func_handle(x0 - 2*delta));
             f_3 = extract_component(func_handle(x0 - delta));
@@ -53,13 +53,13 @@ function derivative = numerical_differentiation(method, delta, func_handle, x0, 
             derivative = (-f_1 + 9*f_2 - 45*f_3 + 45*f_4 - 9*f_5 + f_6) / (60 * delta);
             
         case 'forward'
-            % Forward difference: f'(x) ≈ (f(x+h) - f(x)) / h
+            % Forward difference: f'(x) ~= (f(x+h) - f(x)) / h
             f_0 = extract_component(func_handle(x0));
             f_plus = extract_component(func_handle(x0 + delta));
             derivative = (f_plus - f_0) / delta;
             
         case 'backward'
-            % Backward difference: f'(x) ≈ (f(x) - f(x-h)) / h
+            % Backward difference: f'(x) ~= (f(x) - f(x-h)) / h
             f_0 = extract_component(func_handle(x0));
             f_minus = extract_component(func_handle(x0 - delta));
             derivative = (f_0 - f_minus) / delta;

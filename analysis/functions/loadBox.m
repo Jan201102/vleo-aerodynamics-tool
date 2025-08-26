@@ -9,7 +9,7 @@ function bodies = load_box(energy_accommodation_coefficient,surface_temp__K)
 
     import vleo_aerodynamics_core.*
     % Get absolute path of test folder
-    [test_folder,~,~] = fileparts(mfilename("fullpath"));
+    [test_folder,~,~] = fileparts(mfilename('fullpath'));
 
     disp(test_folder)
     obj_files = string(fullfile(test_folder, '../obj', 'body.obj'));

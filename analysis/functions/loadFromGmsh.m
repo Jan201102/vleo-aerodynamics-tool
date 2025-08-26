@@ -1,9 +1,3 @@
-%% LOAD SHUTTLECOCK FROM GMSH
-% Load the shuttlecock configuration satellite from .obj files
-%
-% This function loads the shuttlecock satellite configuration with
-% main body and control surfaces from GMSH-generated .obj files.
-%
 function bodies = load_from_gmsh(energy_accommodation_coefficient, surface_temp__K)
 %LOAD_FROM_GMSH Load shuttlecock geometry from GMSH-generated files
 %
@@ -27,8 +21,8 @@ function bodies = load_from_gmsh(energy_accommodation_coefficient, surface_temp_
     import vleo_aerodynamics_core.*
     
     %% Get File Path
-    [test_folder, ~, ~] = fileparts(mfilename("fullpath"));
-    gmsh_file = fullfile(test_folder, '../obj', 'Shuttlecock_copy_BA.m');
+    [test_folder, ~, ~] = fileparts(mfilename('fullpath'));
+    gmsh_file = fullfile(test_folder, '../obj', 'Shuttlecock.m');
 
     %% Surface Properties
     surface_temperatures__K = num2cell(surface_temp__K * ones(1, 5));

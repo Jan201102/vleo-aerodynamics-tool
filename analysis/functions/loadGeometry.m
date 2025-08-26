@@ -36,7 +36,7 @@ function [bodies, num_bodies, rotation_face_index, x_label] = ...
         end
         num_bodies = 1;
         rotation_face_index = 1;
-        x_label = "Angle of Attack [°]";
+        x_label = 'Angle of Attack [°]';
         
     elseif strcmp(geometry_type, 'shuttlecock')
         bodies = load_from_gmsh(energy_accommodation, surface_temperature__K);
@@ -45,7 +45,7 @@ function [bodies, num_bodies, rotation_face_index, x_label] = ...
         end
         num_bodies = 5;
         rotation_face_index = [2, 3, 4, 5];
-        x_label = "Control Surface Angle [°]";
+        x_label = 'Control Surface Angle [°]';
         
     elseif strcmp(geometry_type, 'shuttlecock_wing')
         bodies = load_shuttlecock_wing(energy_accommodation, surface_temperature__K);
@@ -54,7 +54,7 @@ function [bodies, num_bodies, rotation_face_index, x_label] = ...
         end
         num_bodies = 1;
         rotation_face_index = 1;
-        x_label = "Angle of Attack [°]";
+        x_label = 'Angle of Attack [°]';
         
     elseif strcmp(geometry_type, 'shuttlecock_wing_new')
         bodies_all = load_from_gmsh(energy_accommodation, surface_temperature__K);
@@ -65,7 +65,7 @@ function [bodies, num_bodies, rotation_face_index, x_label] = ...
         end
         num_bodies = 1;
         rotation_face_index = 1;
-        x_label = "Angle of Attack [°]";
+        x_label = 'Angle of Attack [°]';
         
     elseif strcmp(geometry_type, 'box')
         bodies = load_box(energy_accommodation, surface_temperature__K);
@@ -74,7 +74,7 @@ function [bodies, num_bodies, rotation_face_index, x_label] = ...
         end
         num_bodies = 1;
         rotation_face_index = 1;
-        x_label = "Angle of Attack [°]";
+        x_label = 'Angle of Attack [°]';
         
     elseif strcmp(geometry_type, 'unit_cube')
         bodies = load_unit_cube(energy_accommodation, surface_temperature__K);
@@ -83,10 +83,9 @@ function [bodies, num_bodies, rotation_face_index, x_label] = ...
         end
         num_bodies = 6;
         rotation_face_index = 1;
-        x_label = "Angle of Attack [°]";
+        x_label = 'Angle of Attack [°]';
         
     else
-        error("Invalid geometry_type. Options: 'plate', 'shuttlecock', 'shuttlecock_wing', " + ...
-              "'shuttlecock_wing_new', 'box', or 'unit_cube'.");
+        error('Invalid geometry_type. Options: plate, shuttlecock, shuttlecock_wing, shuttlecock_wing_new, box, or unit_cube.');
     end
 end

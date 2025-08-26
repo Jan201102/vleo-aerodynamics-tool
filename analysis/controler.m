@@ -5,12 +5,12 @@ clear;
 clc;
 
 %% Load Aerodynamic Data
-load("aerodynamic_stiffness_shuttlecock.mat");
-load("aerodynamic_damping_shuttlecock.mat");
+load('aerodynamic_stiffness_shuttlecock.mat');
+load('aerodynamic_damping_shuttlecock.mat');
 
 %% System Parameters
 control_surface_angle = deg2rad(45);  % Control surface deflection angle [rad]
-I_yy = 0.0375;                       % Moment of inertia about y-axis [kg⋅m²]
+I_yy = 0.0375;                       % Moment of inertia about y-axis [kg*m2]
 
 % Interpolate aerodynamic coefficients at control surface angle
 c_m_sentman = interp1(control_surface_angles__rad, aero_stiffness(:,1), control_surface_angle);
@@ -41,10 +41,10 @@ T_irs = feedback(G_0_irs, 1);
 %% Bode Plot - Nominal Case
 figure;
 hold on;
-bodeplot(G_0_sentman, "b");
-bodeplot(G_0_irs, "r");
+bodeplot(G_0_sentman, 'b');
+bodeplot(G_0_irs, 'r');
 grid on;
-legend("Sentman Model", "Schütte Model");
+legend('Sentman Model', 'Schütte Model');
 title('Open-Loop Frequency Response');
 
 % Display stability margins
@@ -71,37 +71,37 @@ figure;
 
 subplot(2,1,1);
 [y, t] = initial(ss_sentman, initial_state_stable);
-plot(t, rad2deg(y), "b");
+plot(t, rad2deg(y), 'b');
 hold on;
 grid on;
 [y, t] = initial(ss_irs, initial_state_stable);
-plot(t, rad2deg(y), "r");
-ylabel("Pitch Angle [°]");
-xlabel("Time [s]");
+plot(t, rad2deg(y), 'r');
+ylabel('Pitch Angle [°]');
+xlabel('Time [s]');
 xlim([0, max(t)]);
-legend("Sentman Model", "Schütte Model");
-title("Stabilized - 5° Initial Displacement");
+legend('Sentman Model', 'Schütte Model');
+title('Stabilized - 5° Initial Displacement');
 
 subplot(2,1,2);
 [y, t] = initial(ss_sentman, initial_state_rotating);
-plot(t, rad2deg(y), "b");
+plot(t, rad2deg(y), 'b');
 hold on;
 grid on;
 [y, t] = initial(ss_irs, initial_state_rotating);
-plot(t, rad2deg(y), "r");
-ylabel("Pitch Angle [°]");
-xlabel("Time [s]");
+plot(t, rad2deg(y), 'r');
+ylabel('Pitch Angle [°]');
+xlabel('Time [s]');
 xlim([0, max(t)]);
-title("Rotating - 1°/s Initial Angular Velocity");
-legend("Sentman Model", "Schütte Model");
+title('Rotating - 1°/s Initial Angular Velocity');
+legend('Sentman Model', 'Schütte Model');
 matlab2tikz('pointing_initial_condition_response.tikz');
 
 %% Density Influence Study
 particles_mass__kg = 16 * 1.6605390689252e-27;  % Atomic oxygen mass [kg]
-n = 4.698e14;                                    % Number density [1/m³]
+n = 4.698e14;                                    % Number density [1/m3]
 nominal_density__kg_per_m3 = particles_mass__kg * n;
-density_max = 1.57e-10;                         % Maximum density [kg/m³]
-density_min = 1.93e-13;                         % Minimum density [kg/m³]
+density_max = 1.57e-10;                         % Maximum density [kg/m3]
+density_min = 1.93e-13;                         % Minimum density [kg/m3]
 
 % Scale aerodynamic coefficients with density
 c_m_sentman_max = density_max / nominal_density__kg_per_m3 * c_m_sentman;
@@ -163,16 +163,16 @@ ss_irs_min = ss(A_irs_min, B_min, C, D);
 %% Bode Plot - Density Study
 figure;
 hold on;
-bodeplot(G_0_sentman_min, "b");
-bodeplot(G_0_sentman_max, "b--");
-bodeplot(G_0_irs_min, "r");
-bodeplot(G_0_irs_max, "r--");
+bodeplot(G_0_sentman_min, 'b');
+bodeplot(G_0_sentman_max, 'b--');
+bodeplot(G_0_irs_min, 'r');
+bodeplot(G_0_irs_max, 'r--');
 grid on;
 
-legend(sprintf("Sentman \\rho = %.2e", density_min), ...
-       sprintf("Sentman \\rho = %.2e", density_max), ...
-       sprintf("IRS \\rho = %.2e", density_min), ...
-       sprintf("IRS \\rho = %.2e", density_max));
+legend(sprintf('Sentman \\rho = %.2e', density_min), ...
+       sprintf('Sentman \\rho = %.2e', density_max), ...
+       sprintf('IRS \\rho = %.2e', density_min), ...
+       sprintf('IRS \\rho = %.2e', density_max));
 title('Open-Loop Frequency Response - Density Study');
 matlab2tikz('G0_bode_density_study.tex', 'showInfo', false);
 
@@ -189,42 +189,42 @@ subplot(2,1,1);
 hold on;
 grid on;
 [y,t] = initial(ss_sentman_min,initial_state_stable);
-plot(t,rad2deg(y),"b")
+plot(t,rad2deg(y),'b')
 [y,t] = initial(ss_sentman_max,initial_state_stable);
-plot(t,rad2deg(y),"b--")
+plot(t,rad2deg(y),'b--')
 [y,t] = initial(ss_irs_min,initial_state_stable);
-plot(t,rad2deg(y),"r")
+plot(t,rad2deg(y),'r')
 xlim([0 max(t)])
 [y,t] = initial(ss_irs_max,initial_state_stable);
-plot(t,rad2deg(y),"r--")
-ylabel("Pitch Angle [°]")
-xlabel("Time [s]")
+plot(t,rad2deg(y),'r--')
+ylabel('Pitch Angle [°]')
+xlabel('Time [s]')
 
-legend(sprintf("sentman \\rho = %.2e",density_min),...
-    sprintf("sentman \\rho = %.2e",density_max),...
-    sprintf("irs \\rho = %.2e",density_min),...
-    sprintf("irs \\rho = %.2e",density_max));
-title("Stabilized")
+legend(sprintf('sentman \\rho = %.2e',density_min),...
+    sprintf('sentman \\rho = %.2e',density_max),...
+    sprintf('irs \\rho = %.2e',density_min),...
+    sprintf('irs \\rho = %.2e',density_max));
+title('Stabilized')
 
 subplot(2,1,2);
 hold on;
 grid on;
 [y,t] = initial(ss_sentman_min,initial_state_rotating);
-plot(t,rad2deg(y),"b")
+plot(t,rad2deg(y),'b')
 [y,t] = initial(ss_sentman_max,initial_state_rotating);
-plot(t,rad2deg(y),"b--")
+plot(t,rad2deg(y),'b--')
 [y,t] = initial(ss_irs_min,initial_state_rotating);
-plot(t,rad2deg(y),"r")
+plot(t,rad2deg(y),'r')
 xlim([0 max(t)])
 [y,t] = initial(ss_irs_max,initial_state_rotating);
-plot(t,rad2deg(y),"r--")
-ylabel("Pitch Angle [°]")
-xlabel("Time [s]")
+plot(t,rad2deg(y),'r--')
+ylabel('Pitch Angle [°]')
+xlabel('Time [s]')
 
-title("Rotating")
-legend(sprintf("sentman \\rho = %.2e",density_min),...
-    sprintf("sentman \\rho = %.2e",density_max),...
-    sprintf("irs \\rho = %.2e",density_min),...
-    sprintf("irs \\rho = %.2e",density_max));
+title('Rotating')
+legend(sprintf('sentman \\rho = %.2e',density_min),...
+    sprintf('sentman \\rho = %.2e',density_max),...
+    sprintf('irs \\rho = %.2e',density_min),...
+    sprintf('irs \\rho = %.2e',density_max));
 
 matlab2tikz('pointing_initial_condition_response_density.tikz');

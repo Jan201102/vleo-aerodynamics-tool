@@ -9,7 +9,7 @@ function bodies = load_box_truncated(energy_accommodation_coefficient,surface_te
 
     import vleo_aerodynamics_core.*
     % Get absolute path of test folder
-    [test_folder,~,~] = fileparts(mfilename("fullpath"));
+    [test_folder,~,~] = fileparts(mfilename('fullpath'));
 
     disp(test_folder)
     obj_files = string(fullfile(test_folder, '../obj', ...

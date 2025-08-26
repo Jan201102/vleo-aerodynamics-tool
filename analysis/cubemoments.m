@@ -6,7 +6,7 @@ clear;
 
 %% Setup Environment, Geometry, and LUT  
 geometry_type = 'plate';
-lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
+lut_file = 'aerodynamic_coefficients_panel_method_poly.mat';
 [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type);
 
 %% Calculate Aerodynamic Forces Across Attitudes
@@ -100,6 +100,6 @@ function plot_symmetry_residuals(x, aerodynamic_force_B__N,x_sym)
     xlabel('Angle [°]');
     ylabel('Residuals [N]');
     title('Symmetry Residuals (Original - Mirrored)');
-    legend("Location","best");
+    legend('Location','best');
     grid on;
 end

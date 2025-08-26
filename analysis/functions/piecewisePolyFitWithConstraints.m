@@ -89,8 +89,6 @@ function coeffs = piecewise_poly_fit_with_constraints(x, y, knots, degrees, cons
     end
 
     % Solve the system of equations
-    % [A'*A  C'] [p]   [A'*y]
-    % [C     0 ] [λ] = [d   ]
     ATA = A' * A;
     ATy = A' * y;
     % Build the augmented system
