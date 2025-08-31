@@ -1,7 +1,7 @@
 %% LOAD BOX TRUNCATED
 %% This functions loads the box shaped satellite
 %  from six separate .obj files for each side
-function bodies = load_box_truncated(energy_accommodation_coefficient,surface_temp__K)
+function bodies = loadBoxTruncated(energy_accommodation_coefficient,surface_temp__K)
     arguments
         energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
         surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
@@ -9,7 +9,7 @@ function bodies = load_box_truncated(energy_accommodation_coefficient,surface_te
 
     import vleo_aerodynamics_core.*
     % Get absolute path of test folder
-    [test_folder,~,~] = fileparts(mfilename("fullpath"));
+    [test_folder,~,~] = fileparts(mfilename('fullpath'));
 
     disp(test_folder)
     obj_files = string(fullfile(test_folder, '../obj', ...
@@ -33,7 +33,7 @@ function bodies = load_box_truncated(energy_accommodation_coefficient,surface_te
     % Surface energy accommodation coefficients for all six sides
     surface_energy_accommodation_coefficients = num2cell(energy_accommodation_coefficient*ones(1,6));
 
-    % Use the same DCM and CoM as in load_box
+    % Use the same DCM and CoM as in loadBox
     DCM_B_from_CAD = [0, -1, 0;...
                         -1, 0, 0; ...
                         0, 0, -1];

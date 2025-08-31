@@ -8,11 +8,11 @@ clear;
 geometry_type = 'shuttlecock';
 
 % Setup for table-based LUT
-lut_file_table = "aerodynamic_coefficients_panel_method.csv";
+lut_file_table = 'aerodynamic_coefficients_panel_method.csv';
 [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data_table] = setup(lut_file_table, geometry_type);
 
 % Setup for polynomial-based LUT  
-lut_file_poly = "aerodynamic_coefficients_panel_method_poly.mat";
+lut_file_poly = 'aerodynamic_coefficients_panel_method_poly.mat';
 [~, ~, ~, ~, ~, lut_data_poly] = setup(lut_file_poly, geometry_type);
 
 %% Runtime Benchmark

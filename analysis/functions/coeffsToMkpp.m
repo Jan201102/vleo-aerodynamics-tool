@@ -1,15 +1,15 @@
 
-function pp = coeffs_to_mkpp(coeffs, knots, degrees)
-%COEFFS_TO_MKPP Convert piecewise polynomial coefficients to MATLAB pp structure
+function pp = coeffsToMkpp(coeffs, knots, degrees)
+%coeffsToMkpp Convert piecewise polynomial coefficients to MATLAB pp structure
 %
-%   pp = COEFFS_TO_MKPP(coeffs, knots, degrees)
+%   pp = coeffsToMkpp(coeffs, knots, degrees)
 %
 %   Converts global coordinate piecewise polynomial coefficients from 
-%   piecewise_poly_fit_with_constraints to a MATLAB piecewise polynomial
+%   piecewisePolyFitWithConstraints to a MATLAB piecewise polynomial
 %   structure compatible with ppval.
 %
 % Inputs:
-%   coeffs  - Coefficient vector from piecewise_poly_fit_with_constraints
+%   coeffs  - Coefficient vector from piecewisePolyFitWithConstraints
 %   knots   - Vector of knot points (same as used in fitting)
 %   degrees - Vector of polynomial degrees for each segment
 %

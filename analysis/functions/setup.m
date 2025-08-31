@@ -1,11 +1,12 @@
 function [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut] = ...
-         setup(lut_file, geometry_type, energy_accommodation)
+         setup(lut_file, geometry_type, energy_accommodation, two_sided)
     %SETUP Initialize environment, geometry, and lookup table for aerodynamic analysis
     %
     % Inputs:
     %   lut_file              - String, path to lookup table file
     %   geometry_type         - String, geometry type ('plate', 'shuttlecock', etc.)
     %   energy_accommodation  - Double, optional energy accommodation coefficient
+    %   two_sided             - Boolean, whether the geometry is two-sided
     %
     % Outputs:
     %   bodies                - Body structure array
@@ -19,6 +20,7 @@ function [bodies, num_bodies, rotation_face_index, x_label, environment_definiti
         lut_file string
         geometry_type string
         energy_accommodation double = -1
+        two_sided logical = true
     end
 
     import vleo_aerodynamics_core.*;
@@ -30,9 +32,9 @@ function [bodies, num_bodies, rotation_face_index, x_label, environment_definiti
     % T_i = 934K (gas temperature)
     % T_w = 300K (wall/surface temperature)  
     % u = 7800 m/s (orbital velocity)
-    % n = 4.698e14 1/m³ (number density)
+    % n = 4.698e14 1/m3 (number density)
     % Particle mass = 16U (atomic oxygen)
-    % Resulting density: rho = 1.2482e-11 kg/m³
+    % Resulting density: rho = 1.2482e-11 kg/m3
     
     environment_definitions.rotational_velocity_BI_B__rad_per_s = 0;
     environment_definitions.velocity_I_I__m_per_s = 7800 * [1; 0; 0];
@@ -64,17 +66,18 @@ function [bodies, num_bodies, rotation_face_index, x_label, environment_definiti
         lut_path = fullfile(parent_folder, lut_file);
         
         if ~isfile(lut_path)
-            error("Look-up table file not found. Please check the path: %s", lut_path);
+            error('Look-up table file not found. Please check the path: %s', lut_path);
         end
         
         lut = readmatrix(lut_path);
-        lut = griddedInterpolant(lut(:,1), lut(:,2:3), "spline");
+        lut = griddedInterpolant(lut(:,1), lut(:,2:3), 'spline');
     end
 
     %% Load Geometry
-    [bodies, num_bodies, rotation_face_index, x_label] = load_geometry(...
+    [bodies, num_bodies, rotation_face_index, x_label] = loadGeometry(...
         geometry_type, ...
         environment_definitions.energy_accommodation, ...
-        environment_definitions.surface_temperature__K);
+        environment_definitions.surface_temperature__K, ...
+        two_sided);
 
 end

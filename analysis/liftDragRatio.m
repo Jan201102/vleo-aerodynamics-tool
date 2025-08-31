@@ -6,7 +6,7 @@ clear;
 
 %% Setup Environment, Geometry, and LUT
 geometry_type = 'plate';  % Options: 'plate' or 'shuttlecock'
-lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
+lut_file = 'aerodynamic_coefficients_panel_method_poly.mat';
 [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type);
 if strcmp(geometry_type, 'shuttlecock')
     rotation_face_index = 3;
@@ -58,9 +58,9 @@ lift_to_drag_ratio_new = lift_new__N ./ drag_new__N;
 figure;
 hold on;
 grid on;
-plot(rad2deg(control_surface_angles__rad), lift_to_drag_ratio_sentman, "b", 'DisplayName', ...
+plot(rad2deg(control_surface_angles__rad), lift_to_drag_ratio_sentman, 'b', 'DisplayName', ...
      sprintf('Sentman Model \\alpha_E = %.4f', environment_definitions.energy_accommodation));
-plot(rad2deg(control_surface_angles__rad), lift_to_drag_ratio_new, "r", 'DisplayName', 'IRS Model');
+plot(rad2deg(control_surface_angles__rad), lift_to_drag_ratio_new, 'r', 'DisplayName', 'IRS Model');
 xlabel(x_label);
 ylabel('Lift-to-Drag Ratio [-]');
 title('Lift-to-Drag Ratio Comparison');
@@ -78,8 +78,8 @@ figure;
 subplot(2,1,1);
 hold on;
 grid on;
-plot(rad2deg(control_surface_angles__rad), lift_sentman__N/factor, "b", 'DisplayName', 'Sentman Model');
-plot(rad2deg(control_surface_angles__rad), lift_new__N/factor, "r", 'DisplayName', 'IRS Model');
+plot(rad2deg(control_surface_angles__rad), lift_sentman__N/factor, 'b', 'DisplayName', 'Sentman Model');
+plot(rad2deg(control_surface_angles__rad), lift_new__N/factor, 'r', 'DisplayName', 'IRS Model');
 xlabel(x_label);
 ylabel('C_L [-]');
 title('Lift Coefficient');
@@ -88,8 +88,8 @@ legend('Location', 'best');
 subplot(2,1,2);
 hold on;
 grid on;
-plot(rad2deg(control_surface_angles__rad), drag_sentman__N/factor, "b", 'DisplayName', 'Sentman Model');
-plot(rad2deg(control_surface_angles__rad), drag_new__N/factor, "r", 'DisplayName', 'IRS Model');
+plot(rad2deg(control_surface_angles__rad), drag_sentman__N/factor, 'b', 'DisplayName', 'Sentman Model');
+plot(rad2deg(control_surface_angles__rad), drag_new__N/factor, 'r', 'DisplayName', 'IRS Model');
 xlabel(x_label);
 ylabel('C_D [-]');
 title('Drag Coefficient');

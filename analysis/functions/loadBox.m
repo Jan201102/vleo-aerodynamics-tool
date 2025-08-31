@@ -1,7 +1,7 @@
 %% LOAD box
 %% This functions loads the box shaped sattelite
 %  from .obj files stored in the example folder
-function bodies = load_box(energy_accommodation_coefficient,surface_temp__K)
+function bodies = loadBox(energy_accommodation_coefficient,surface_temp__K)
     arguments
         energy_accommodation_coefficient (1,1) double = 0.9; % Energy accommodation coefficient
         surface_temp__K (1,1) double = 300; % Surface temperature in Kelvin
@@ -9,7 +9,7 @@ function bodies = load_box(energy_accommodation_coefficient,surface_temp__K)
 
     import vleo_aerodynamics_core.*
     % Get absolute path of test folder
-    [test_folder,~,~] = fileparts(mfilename("fullpath"));
+    [test_folder,~,~] = fileparts(mfilename('fullpath'));
 
     disp(test_folder)
     obj_files = string(fullfile(test_folder, '../obj', 'body.obj'));

@@ -6,8 +6,8 @@ clear;
 
 %% Setup Environment, Geometry, and LUT  
 geometry_type = 'plate';
-lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
-[bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type);
+lut_file = 'aerodynamic_coefficients_panel_method_poly.mat';
+[bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type,-1, false);
 
 %% Calculate Aerodynamic Forces Across Attitudes
 num_angles = 201;
@@ -20,7 +20,7 @@ for model = 1:2
         current_angle = control_surface_angles__rad(i);
         
         % Create attitude quaternion for rotation about y-axis
-        attitude_quaternion_BI = [cos(current_angle/2); 0; -sin(current_angle/2); 0];
+        attitude_quaternion_BI = [ 0; -sin(current_angle/2); 0;cos(current_angle/2)];
         bodies_rotation_angles__rad = zeros(1, num_bodies);
         
         [aerodynamic_force_B__N(:,i,model), ~, ~, ~] = ...
@@ -50,9 +50,11 @@ aerodynamic_force_filtered_B__N = aerodynamic_force_B__N(:,control_surface_angle
 plot_symmetry_residuals(control_surface_angles_sym, aerodynamic_force_filtered_B__N, x_sym);
 
 %matlab2tikz('onesidedplate_symetry.tex')
+%% plot force below 0
+aerodynamic_force_backside_B__N = aerodynamic_force_B__N(1,control_surface_angles__rad<=0,1);
 
 %% Helper functions
-function plot_symmetry_residuals(x, aerodynamic_force_B__N,x_sym)
+function plot_symmetry_residuals(x, aerodynamic_force_B__N,aerodynamic_force_backside_B__N,x_sym)
     % PLOT_SYMMETRY_RESIDUALS Plot symmetry residuals for both Sentman and IRS models
     %
     % Inputs:
@@ -100,6 +102,6 @@ function plot_symmetry_residuals(x, aerodynamic_force_B__N,x_sym)
     xlabel('Angle [°]');
     ylabel('Residuals [N]');
     title('Symmetry Residuals (Original - Mirrored)');
-    legend("Location","best");
+    legend('Location','best');
     grid on;
 end

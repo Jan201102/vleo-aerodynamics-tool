@@ -1,7 +1,7 @@
-function stiffness = calculate_aerodynamic_stiffness(method, alpha_zero, delta__rad, axis_dir_B, component, bodies, bodies_rotation_angles__rad, model, lut_data, environment_definitions)
-%% calculate_aerodynamic_stiffness - calculate the aerodynamic stiffness using numerical differentiation
+function stiffness = calculateAerodynamicStiffness(method, alpha_zero, delta__rad, axis_dir_B, component, bodies, bodies_rotation_angles__rad, model, lut_data, environment_definitions)
+%% calculateAerodynamicStiffness - calculate the aerodynamic stiffness using numerical differentiation
 %
-% stiffness = calculate_aerodynamic_stiffness(method,...
+% stiffness = calculateAerodynamicStiffness(method,...
 %                                             alpha_zero,...
 %                                             delta__rad,...
 %                                             axis_dir_B,...
@@ -46,7 +46,7 @@ function stiffness = calculate_aerodynamic_stiffness(method, alpha_zero, delta__
     torque_func = @(attitude_angle__rad) compute_torque_at_angle(attitude_angle__rad, axis_dir_B, bodies, bodies_rotation_angles__rad, model, lut_data, environment_definitions);
     
     % Use generic numerical differentiation function
-    stiffness = numerical_differentiation(method, delta__rad, torque_func, alpha_zero, component);
+    stiffness = numericalDifferentiation(method, delta__rad, torque_func, alpha_zero, component);
     
 end
 

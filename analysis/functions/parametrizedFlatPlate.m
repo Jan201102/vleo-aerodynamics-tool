@@ -1,7 +1,7 @@
-function bodies = parametrized_flat_plate(x_dim, y_dim, cog, two_sided, energy_accommodation_coefficient, surface_temp__K)
-%PARAMETRIZED_FLAT_PLATE Create a parametrized flat plate body structure
+function bodies = parametrizedFlatPlate(x_dim, y_dim, cog, two_sided, energy_accommodation_coefficient, surface_temp__K)
+%parametrizedFlatPlate Create a parametrized flat plate body structure
 %
-%   bodies = PARAMETRIZED_FLAT_PLATE(x_dim, y_dim, cog, two_sided, energy_accommodation_coefficient, surface_temp__K)
+%   bodies = parametrizedFlatPlate(x_dim, y_dim, cog, two_sided, energy_accommodation_coefficient, surface_temp__K)
 %
 %   Creates a flat plate body structure with specified dimensions and properties.
 %   The plate can be configured as one-sided or two-sided for aerodynamic analysis.

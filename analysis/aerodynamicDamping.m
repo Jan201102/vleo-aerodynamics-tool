@@ -6,7 +6,7 @@ clear;
 
 %% Setup Environment, Geometry, and LUT
 geometry_type = 'shuttlecock';  % Options: 'plate' or 'shuttlecock'
-lut_file = "aerodynamic_coefficients_panel_method_poly.mat";
+lut_file = 'aerodynamic_coefficients_panel_method_poly.mat';
 [bodies, num_bodies, rotation_face_index, x_label, environment_definitions, lut_data] = setup(lut_file, geometry_type);
 
 %% Derivation Configuration
@@ -26,7 +26,7 @@ for model = 1:2
         bodies_rotation_angles__rad = zeros(1, num_bodies);
         bodies_rotation_angles__rad(rotation_face_index) = current_angle;
         
-        aero_damping(i, model) = calculate_aerodynamic_damping(...
+        aero_damping(i, model) = calculateAerodynamicDamping(...
             derivation_method, ...
             delta_q_rad_per_s, ...
             axis_direction, ...
@@ -42,7 +42,7 @@ for model = 1:2
 end
 
 % Save results
-save("aerodynamic_damping_shuttlecock.mat", "aero_damping", "control_surface_angles__rad");
+save('aerodynamic_damping_shuttlecock.mat', 'aero_damping', 'control_surface_angles__rad');
 %% Plot Results
 figure;
 plot(rad2deg(control_surface_angles__rad), aero_damping(:,1), 'b');

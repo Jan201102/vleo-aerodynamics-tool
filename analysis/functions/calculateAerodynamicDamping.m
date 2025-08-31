@@ -1,7 +1,7 @@
-function damping = calculate_aerodynamic_damping(method, delta__rad_per_s, axis_dir_B, component, bodies, bodies_rotation_angles__rad, model, lut_data, environment_definitions)
-%% calculate_aerodynamic_damping - calculate the aerodynamic damping using numerical differentiation
+function damping = calculateAerodynamicDamping(method, delta__rad_per_s, axis_dir_B, component, bodies, bodies_rotation_angles__rad, model, lut_data, environment_definitions)
+%% calculateAerodynamicDamping - calculate the aerodynamic damping using numerical differentiation
 %
-% damping = calculate_aerodynamic_damping(method,...
+% damping = calculateAerodynamicDamping(method,...
 %                                             delta__rad_per_s,...
 %                                             axis_dir_B,...
 %                                             component,...
@@ -43,7 +43,7 @@ function damping = calculate_aerodynamic_damping(method, delta__rad_per_s, axis_
     torque_func = @(rotational_velocity_magnitude) compute_torque_at_rotational_velocity(rotational_velocity_magnitude, axis_dir_B, bodies, bodies_rotation_angles__rad, model, lut_data, environment_definitions);
     
     % Use generic numerical differentiation function (derivative at rotational velocity = 0)
-    damping = numerical_differentiation(method, delta__rad_per_s, torque_func, 0, component);
+    damping = numericalDifferentiation(method, delta__rad_per_s, torque_func, 0, component);
 end
 
 function torque = compute_torque_at_rotational_velocity(rotational_velocity_magnitude, axis_direction, bodies, bodies_rotation_angles__rad, model, lut_data, environment_definitions)

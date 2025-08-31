@@ -27,8 +27,8 @@ data = [AoA_total, C_l_total, C_d_total];
 %% Plot Raw Data
 figure;
 hold on;
-scatter(AoA_total, C_l_total, ".", 'DisplayName', 'C_l Data', 'SizeData', 50);
-scatter(AoA_total, C_d_total, ".", 'DisplayName', 'C_d Data', 'SizeData', 50);
+scatter(AoA_total, C_l_total, '.', 'DisplayName', 'C_l Data', 'SizeData', 50);
+scatter(AoA_total, C_d_total, '.', 'DisplayName', 'C_d Data', 'SizeData', 50);
 xlabel('Angle of Attack [°]');
 ylabel('Aerodynamic Coefficients [-]');
 title('Raw Aerodynamic Coefficient Data');
@@ -61,12 +61,12 @@ for i = 1:length(degree_range)
     constraint_points_Cl = [90, 0];
     
     % Fit polynomials
-    global_piecewise_coeff_cl = piecewise_poly_fit_with_constraints(AoA_total, C_l_total, boundaries, poly_degrees, constraint_points_Cl, 1);
-    global_piecewise_coeff_cd = piecewise_poly_fit_with_constraints(AoA_total, C_d_total, boundaries, poly_degrees, [], 1);
+    global_piecewise_coeff_cl = piecewisePolyFitWithConstraints(AoA_total, C_l_total, boundaries, poly_degrees, constraint_points_Cl, 1);
+    global_piecewise_coeff_cd = piecewisePolyFitWithConstraints(AoA_total, C_d_total, boundaries, poly_degrees, [], 1);
     
     % Convert to piecewise polynomials
-    pp_Cl = coeffs_to_mkpp(global_piecewise_coeff_cl, boundaries, poly_degrees);
-    pp_Cd = coeffs_to_mkpp(global_piecewise_coeff_cd, boundaries, poly_degrees);
+    pp_Cl = coeffsToMkpp(global_piecewise_coeff_cl, boundaries, poly_degrees);
+    pp_Cd = coeffsToMkpp(global_piecewise_coeff_cd, boundaries, poly_degrees);
     
     % Calculate predictions for segments 2 and 3 only
     Cl_pred = ppval(pp_Cl, AoA_total(segment_2_3_idx));
@@ -88,7 +88,7 @@ plot(degree_range, mse_cd_values);
 xlabel('Polynomial Degree');
 ylabel('MSE');
 title('MSE vs Polynomial Degree');
-legend("C_l","C_d")
+legend('C_l','C_d')
 grid on;
 set(gca, 'YScale', 'log'); % Use log scale for better visualization
 
@@ -107,11 +107,11 @@ poly_degrees_c_l = [0, 8,8];
 poly_degrees_c_d = [0,9,9];
 constraint_points_Cl = [90,0];
 
-global_piecewise_coeff_cl = piecewise_poly_fit_with_constraints(AoA_total, C_l_total, boundaries, poly_degrees_c_l, constraint_points_Cl, 1);
-global_piecewise_coeff_cd = piecewise_poly_fit_with_constraints(AoA_total, C_d_total, boundaries, poly_degrees_c_d, [], 1);
-pp_Cl = coeffs_to_mkpp(global_piecewise_coeff_cl, boundaries, poly_degrees_c_l);
-pp_Cd = coeffs_to_mkpp(global_piecewise_coeff_cd, boundaries, poly_degrees_c_d);
-save("aerodynamic_coefficients_panel_method_poly.mat","pp_Cd","pp_Cl");
+global_piecewise_coeff_cl = piecewisePolyFitWithConstraints(AoA_total, C_l_total, boundaries, poly_degrees_c_l, constraint_points_Cl, 1);
+global_piecewise_coeff_cd = piecewisePolyFitWithConstraints(AoA_total, C_d_total, boundaries, poly_degrees_c_d, [], 1);
+pp_Cl = coeffsToMkpp(global_piecewise_coeff_cl, boundaries, poly_degrees_c_l);
+pp_Cd = coeffsToMkpp(global_piecewise_coeff_cd, boundaries, poly_degrees_c_d);
+save('aerodynamic_coefficients_panel_method_poly.mat','pp_Cd','pp_Cl');
 %% Test and plot the results
 AoA_test = linspace(-90, 90, 1000);
 Cl_combined = ppval(pp_Cl, AoA_test);

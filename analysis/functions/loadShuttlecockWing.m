@@ -1,6 +1,6 @@
 %% LOAD SHUTTLECOCK WING
 %% This function loads only the WingRight configuration from the shuttlecock satellite
-function bodies = load_shuttlecock_wing(energy_accommodation, surface_temperature__K)
+function bodies = loadShuttlecockWing(energy_accommodation, surface_temperature__K)
     import vleo_aerodynamics_core.*
     
     % Get absolute path of test folder
@@ -9,11 +9,11 @@ function bodies = load_shuttlecock_wing(energy_accommodation, surface_temperatur
     % Load only WingRight.obj (index 4 in the original array)
     object_files = string(fullfile(test_folder, 'obj', 'WingRight.obj'));
     
-    % Use parameters for WingRight (index 4 from load_model)
+    % Use parameters for WingRight (index 4 from loadModel)
     surface_temperatures__K = {surface_temperature__K}; % 300*(3) for index 4 (0-based: 300*3)
     surface_energy_accommodation_coefficients = {energy_accommodation};
     
-    % WingRight parameters (column 4 from load_model)
+    % WingRight parameters (column 4 from loadModel)
     rotation_hinge_points_CAD = [0.05; 0; 0];
     rotation_directions_CAD = [0; -1; 0];
     
