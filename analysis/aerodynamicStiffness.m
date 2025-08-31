@@ -47,11 +47,11 @@ save('aerodynamic_stiffness_shuttlecock.mat', 'control_surface_angles__rad', 'ae
 %% Evaluation
 difference =abs( aero_stiffness(:,1) - aero_stiffness(:,2));
 [m,i] = max(difference);
-fprintf("maximum difference at angle %d, with relative difference %e\n",rad2deg(control_surface_angles__rad(i)),m/aero_stiffness(i,1));
+fprintf('maximum difference at angle %d, with relative difference %e\n',rad2deg(control_surface_angles__rad(i)),m/aero_stiffness(i,1));
 [m,i] = min(aero_stiffness(:,1));
-fprintf("maximum stiffness for sentman at angle %d, with %e\n",rad2deg(control_surface_angles__rad(i)),m);
+fprintf('maximum stiffness for sentman at angle %d, with %e\n',rad2deg(control_surface_angles__rad(i)),m);
 [m,i] = min(aero_stiffness(:,2));
-fprintf("maximum stiffness for schütte at angle %d, with %e\n",rad2deg(control_surface_angles__rad(i)),m);
+fprintf('maximum stiffness for schütte at angle %d, with %e\n',rad2deg(control_surface_angles__rad(i)),m);
 %% Plot Results
 figure;
 plot(rad2deg(control_surface_angles__rad), aero_stiffness(:,1), 'b');
